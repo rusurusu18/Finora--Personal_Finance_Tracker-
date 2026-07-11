@@ -58,19 +58,19 @@ function Navbar() {
 
         <div className={`${isOpen ? 'flex' : 'hidden'} lg:hidden border-t bg-white dark:bg-slate-900`}>
           <div className="flex flex-col p-6 gap-5">
-            <a href="#home" className="font-medium hover:text-blue-600 transition">
+            <a href="#home" onClick={() => setIsOpen(false)} className="font-medium hover:text-blue-600 transition">
               Home
             </a>
-            <a href="#features" className="font-medium hover:text-blue-600 transition">
+            <a href="#features" onClick={() => setIsOpen(false)} className="font-medium hover:text-blue-600 transition">
               Features
             </a>
-            <a href="#pricing" className="font-medium hover:text-blue-600 transition">
+            <a href="#pricing" onClick={() => setIsOpen(false)} className="font-medium hover:text-blue-600 transition">
               Pricing
             </a>
-            <a href="#testimonials" className="font-medium hover:text-blue-600 transition">
+            <a href="#testimonials" onClick={() => setIsOpen(false)} className="font-medium hover:text-blue-600 transition">
               Testimonials
             </a>
-            <a href="#contact" className="font-medium hover:text-blue-600 transition">
+            <a href="#contact" onClick={() => setIsOpen(false)} className="font-medium hover:text-blue-600 transition">
               Contact
             </a>
             <button className="mt-2 bg-blue-600 text-white rounded-xl py-3 font-semibold">
