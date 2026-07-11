@@ -1,0 +1,31 @@
+@import "tailwindcss";
+
+body {
+  font-family: 'Inter', sans-serif;
+}
+
+.glass {
+  backdrop-filter: blur(16px);
+  background: rgba(255, 255, 255, 0.75);
+}
+
+.hero-gradient {
+  background:
+    radial-gradient(circle at top left, rgba(37, 99, 235, 0.2), transparent 35%),
+    radial-gradient(circle at bottom right, rgba(59, 130, 246, 0.15), transparent 35%);
+}
+
+.floating {
+  animation: float 5s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+
+  50% {
+    transform: translateY(-12px);
+  }
+}
