@@ -1,6 +1,8 @@
 import React from 'react'
 import Button from '../components/Button'
 import Feature from './Feature'
+import Pricing from './Pricing'
+import Testimonials from './Testimonials'
 
 const Home = () => {
   return (
@@ -76,6 +78,8 @@ const Home = () => {
       </div>
     </main>
       <Feature />
+      <Pricing />
+      <Testimonials />
     </>
   )
 }
