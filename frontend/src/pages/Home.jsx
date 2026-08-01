@@ -3,6 +3,7 @@ import Button from '../components/Button'
 import Feature from './Feature'
 import Pricing from './Pricing'
 import Testimonials from './Testimonials'
+import Contact from './Contact'
 
 const Home = () => {
   return (
@@ -80,6 +81,7 @@ const Home = () => {
       <Feature />
       <Pricing />
       <Testimonials />
+      <Contact />
     </>
   )
 }
