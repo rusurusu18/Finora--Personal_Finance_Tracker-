@@ -1,35 +1,63 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  --bg: #f8fafc;
+  --bg-muted: #f1f5f9;
+  --card: #ffffff;
+  --text: #0f172a;
+  --muted: #64748b;
+  --border: #e2e8f0;
+  --primary: #4f46e5;
+  --primary-hover: #4338ca;
+  --success: #059669;
+  --danger: #dc2626;
+  --warning: #d97706;
+  --ring: #4f46e5;
+}
+
+.dark {
+  --bg: #0f172a;
+  --bg-muted: #1e293b;
+  --card: #1e293b;
+  --text: #f8fafc;
+  --muted: #94a3b8;
+  --border: #334155;
+  --primary: #6366f1;
+  --primary-hover: #818cf8;
+  --success: #34d399;
+  --danger: #f87171;
+  --warning: #fbbf24;
+  --ring: #818cf8;
+}
+
 html {
   scroll-behavior: smooth;
 }
 
 body {
-  font-family: 'Inter', sans-serif;
+  margin: 0;
+  min-height: 100vh;
+  font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
 }
 
-.glass {
-  backdrop-filter: blur(16px);
-  background: rgba(255, 255, 255, 0.75);
+#root {
+  min-height: 100vh;
 }
 
-.hero-gradient {
-  background:
-    radial-gradient(circle at top left, rgba(37, 99, 235, 0.2), transparent 35%),
-    radial-gradient(circle at bottom right, rgba(59, 130, 246, 0.15), transparent 35%);
+*:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
 }
 
-.floating {
-  animation: float 5s ease-in-out infinite;
-}
-
-@keyframes float {
-  0%,
-  100% {
-    transform: translateY(0px);
-  }
-
-  50% {
-    transform: translateY(-12px);
+@media print {
+  nav,
+  aside,
+  .no-print {
+    display: none !important;
   }
 }

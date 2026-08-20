@@ -1,15 +1,19 @@
-import React from 'react'
-import Navbar from './components/Navbar'
-import Home from './pages/Home'
+import { AuthProvider } from './contexts/AuthContext'
+import { FinanceProvider } from './contexts/FinanceContext'
+import { ThemeProvider } from './contexts/ThemeContext'
+import AppRouter from './Routes/AppRouter'
+import { ToastProvider } from './ui/Toast'
 
-const App = () => {
+export default function App() {
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-800 dark:bg-slate-950 dark:text-white transition duration-300">
-      <Navbar />
-      <Home />
-    </div>
+    <ThemeProvider>
+      <AuthProvider>
+        <FinanceProvider>
+          <ToastProvider>
+            <AppRouter />
+          </ToastProvider>
+        </FinanceProvider>
+      </AuthProvider>
+    </ThemeProvider>
   )
 }
-
-export default App
-
