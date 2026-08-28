@@ -22,7 +22,7 @@ export default function HeroSection({ onGetStarted, onExplore }) {
           </Button>
         </div>
         <p className="mt-6 text-sm text-slate-500">
-          Built around NPR. Later this frontend will connect to Express, MySQL, and JWT auth.
+          Built around NPR.
         </p>
       </div>
 
