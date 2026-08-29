@@ -1,0 +1,4 @@
+# Migrations
+
+This directory contains Prisma database migrations.
+Run `npx prisma migrate dev` to create new migrations.
