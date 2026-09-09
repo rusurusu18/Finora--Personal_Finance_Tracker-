@@ -1,13 +1,21 @@
 import { Navigate, Route, Routes } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
+
 import AdminLayout from '../layout/AdminLayout'
 import AuthLayout from '../layout/AuthLayout'
 import Layout from '../layout/Layout'
+
 import About from '../pages/About'
+import Contact from '../pages/Contact'
+import Features from '../pages/Features'
+import Home from '../pages/Home'
+import Pricing from '../pages/Pricing'
+import NotFound from '../pages/Notfound'
+
 import ForgotPassword from '../pages/auth/ForgotPassword'
 import Login from '../pages/auth/Login'
 import Register from '../pages/auth/Register'
-import Contact from '../pages/Contact'
+
 import Accounts from '../pages/dashboard/Accounts'
 import Analytics from '../pages/dashboard/Analytics'
 import Budgets from '../pages/dashboard/Budgets'
@@ -17,35 +25,71 @@ import Reports from '../pages/dashboard/Reports'
 import SavingsGoals from '../pages/dashboard/SavingsGoals'
 import Settings from '../pages/dashboard/Settings'
 import Transactions from '../pages/dashboard/Transactions'
-import Error from '../pages/Error'
-import Features from '../pages/Features'
-import Home from '../pages/Home'
-import Pricing from '../pages/Pricing'
+
+
+// ==========================================
+// PROTECTED ROUTE
+// ==========================================
 
 function ProtectedRoute({ children }) {
   const { isAuthenticated } = useAuth()
+
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />
   }
+
   return children
 }
+
+
+// ==========================================
+// APP ROUTER
+// ==========================================
 
 export default function AppRouter() {
   return (
     <Routes>
+
+      {/* ======================================
+          PUBLIC WEBSITE
+          ====================================== */}
+
       <Route element={<Layout />}>
+
         <Route path="/" element={<Home />} />
+
         <Route path="/about" element={<About />} />
+
         <Route path="/features" element={<Features />} />
+
         <Route path="/contact" element={<Contact />} />
+
         <Route path="/pricing" element={<Pricing />} />
+
       </Route>
 
+
+      {/* ======================================
+          AUTHENTICATION
+          ====================================== */}
+
       <Route element={<AuthLayout />}>
+
         <Route path="/login" element={<Login />} />
+
         <Route path="/register" element={<Register />} />
-        <Route path="/forgot-password" element={<ForgotPassword />} />
+
+        <Route
+          path="/forgot-password"
+          element={<ForgotPassword />}
+        />
+
       </Route>
+
+
+      {/* ======================================
+          PROTECTED DASHBOARD
+          ====================================== */}
 
       <Route
         path="/dashboard"
@@ -55,19 +99,73 @@ export default function AppRouter() {
           </ProtectedRoute>
         }
       >
-        <Route index element={<Overview />} />
-        <Route path="transactions" element={<Transactions />} />
-        <Route path="budgets" element={<Budgets />} />
-        <Route path="analytics" element={<Analytics />} />
-        <Route path="accounts" element={<Accounts />} />
-        <Route path="savings" element={<SavingsGoals />} />
-        <Route path="reports" element={<Reports />} />
-        <Route path="notifications" element={<Notifications />} />
-        <Route path="settings" element={<Settings />} />
+
+        {/* /dashboard */}
+        <Route
+          index
+          element={<Overview />}
+        />
+
+        {/* /dashboard/transactions */}
+        <Route
+          path="transactions"
+          element={<Transactions />}
+        />
+
+        {/* /dashboard/budgets */}
+        <Route
+          path="budgets"
+          element={<Budgets />}
+        />
+
+        {/* /dashboard/analytics */}
+        <Route
+          path="analytics"
+          element={<Analytics />}
+        />
+
+        {/* /dashboard/accounts */}
+        <Route
+          path="accounts"
+          element={<Accounts />}
+        />
+
+        {/* /dashboard/savings */}
+        <Route
+          path="savings"
+          element={<SavingsGoals />}
+        />
+
+        {/* /dashboard/reports */}
+        <Route
+          path="reports"
+          element={<Reports />}
+        />
+
+        {/* /dashboard/notifications */}
+        <Route
+          path="notifications"
+          element={<Notifications />}
+        />
+
+        {/* /dashboard/settings */}
+        <Route
+          path="settings"
+          element={<Settings />}
+        />
+
       </Route>
 
-      <Route path="/404" element={<Error />} />
-      <Route path="*" element={<Error />} />
+
+      {/* ======================================
+          404 - PAGE NOT FOUND
+          ====================================== */}
+
+      <Route
+        path="*"
+        element={<NotFound />}
+      />
+
     </Routes>
   )
 }
