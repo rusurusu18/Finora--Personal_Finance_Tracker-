@@ -10,11 +10,12 @@ import Contact from '../pages/Contact'
 import Features from '../pages/Features'
 import Home from '../pages/Home'
 import Pricing from '../pages/Pricing'
-import NotFound from '../pages/Notfound'
+import NotFound from '../pages/NotFound'
 
 import ForgotPassword from '../pages/auth/ForgotPassword'
 import Login from '../pages/auth/Login'
 import Register from '../pages/auth/Register'
+import ResetPassword from '../pages/auth/ResetPassword'
 
 import Accounts from '../pages/dashboard/Accounts'
 import Analytics from '../pages/dashboard/Analytics'
@@ -25,6 +26,7 @@ import Reports from '../pages/dashboard/Reports'
 import SavingsGoals from '../pages/dashboard/SavingsGoals'
 import Settings from '../pages/dashboard/Settings'
 import Transactions from '../pages/dashboard/Transactions'
+import Profile from '../pages/dashboard/Profile'
 
 
 // ==========================================
@@ -56,15 +58,30 @@ export default function AppRouter() {
 
       <Route element={<Layout />}>
 
-        <Route path="/" element={<Home />} />
+        <Route
+          path="/"
+          element={<Home />}
+        />
 
-        <Route path="/about" element={<About />} />
+        <Route
+          path="/about"
+          element={<About />}
+        />
 
-        <Route path="/features" element={<Features />} />
+        <Route
+          path="/features"
+          element={<Features />}
+        />
 
-        <Route path="/contact" element={<Contact />} />
+        <Route
+          path="/contact"
+          element={<Contact />}
+        />
 
-        <Route path="/pricing" element={<Pricing />} />
+        <Route
+          path="/pricing"
+          element={<Pricing />}
+        />
 
       </Route>
 
@@ -75,13 +92,24 @@ export default function AppRouter() {
 
       <Route element={<AuthLayout />}>
 
-        <Route path="/login" element={<Login />} />
+        <Route
+          path="/login"
+          element={<Login />}
+        />
 
-        <Route path="/register" element={<Register />} />
+        <Route
+          path="/register"
+          element={<Register />}
+        />
 
         <Route
           path="/forgot-password"
           element={<ForgotPassword />}
+        />
+
+        <Route
+          path="/reset-password"
+          element={<ResetPassword />}
         />
 
       </Route>
@@ -146,6 +174,12 @@ export default function AppRouter() {
         <Route
           path="notifications"
           element={<Notifications />}
+        />
+
+        {/* /dashboard/profile */}
+        <Route
+          path="profile"
+          element={<Profile />}
         />
 
         {/* /dashboard/settings */}
