@@ -10,3 +10,195 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+
+// ==========================================
+// ENUMS
+// ==========================================
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum AccountType {
+  BANK
+  WALLET
+  CASH
+}
+
+enum TransactionType {
+  INCOME
+  EXPENSE
+  TRANSFER
+}
+
+enum BudgetPeriod {
+  WEEKLY
+  MONTHLY
+  YEARLY
+}
+
+enum GoalStatus {
+  ACTIVE
+  COMPLETED
+  PAUSED
+}
+
+enum CategoryType {
+  INCOME
+  EXPENSE
+}
+
+
+// ==========================================
+// USER
+// ==========================================
+
+model User {
+  id               String    @id @default(cuid())
+  fullName         String
+  email            String    @unique
+  password         String
+  phone            String?
+  avatarUrl        String?
+  currency         String    @default("NPR")
+  role             Role      @default(USER)
+  resetToken       String?
+  resetTokenExpiry DateTime?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  accounts      Account[]
+  transactions  Transaction[]
+  categories    Category[]
+  budgets       Budget[]
+  savingsGoals  SavingsGoal[]
+  notifications Notification[]
+}
+
+
+// ==========================================
+// ACCOUNT
+// ==========================================
+
+model Account {
+  id        String      @id @default(cuid())
+  userId    String
+  name      String
+  type      AccountType
+  balance   Decimal     @default(0) @db.Decimal(15, 2)
+  currency  String      @default("NPR")
+  icon      String?
+  color     String?
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+
+  user           User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transactions   Transaction[] @relation("AccountTransactions")
+  toTransactions Transaction[] @relation("ToAccountTransactions")
+}
+
+
+// ==========================================
+// CATEGORY
+// ==========================================
+
+model Category {
+  id        String       @id @default(cuid())
+  userId    String?
+  name      String
+  type      CategoryType
+  color     String       @default("#6366f1")
+  icon      String       @default("📦")
+  isDefault Boolean      @default(false)
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+
+  user         User?         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transactions Transaction[]
+  budgets      Budget[]
+}
+
+
+// ==========================================
+// TRANSACTION
+// ==========================================
+
+model Transaction {
+  id          String          @id @default(cuid())
+  userId      String
+  accountId   String
+  toAccountId String?
+  categoryId  String?
+  type        TransactionType
+  amount      Decimal         @db.Decimal(15, 2)
+  description String
+  notes       String?
+  date        DateTime
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  account   Account   @relation("AccountTransactions", fields: [accountId], references: [id], onDelete: Cascade)
+  toAccount Account?  @relation("ToAccountTransactions", fields: [toAccountId], references: [id], onDelete: SetNull)
+  category  Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+}
+
+
+// ==========================================
+// BUDGET
+// ==========================================
+
+model Budget {
+  id         String       @id @default(cuid())
+  userId     String
+  categoryId String
+  amount     Decimal      @db.Decimal(15, 2)
+  period     BudgetPeriod @default(MONTHLY)
+  startDate  DateTime
+  endDate    DateTime
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  category Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+}
+
+
+// ==========================================
+// SAVINGS GOAL
+// ==========================================
+
+model SavingsGoal {
+  id            String     @id @default(cuid())
+  userId        String
+  name          String
+  targetAmount  Decimal    @db.Decimal(15, 2)
+  currentAmount Decimal    @default(0) @db.Decimal(15, 2)
+  targetDate    DateTime?
+  status        GoalStatus @default(ACTIVE)
+  icon          String?
+  color         String?
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+
+// ==========================================
+// NOTIFICATION
+// ==========================================
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  title     String
+  message   String
+  type      String   @default("INFO")
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
