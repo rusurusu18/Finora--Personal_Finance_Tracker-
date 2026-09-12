@@ -1,14 +1,18 @@
 {
+  "name": "finora-backend",
+  "version": "1.0.0",
+  "type": "module",
   "dependencies": {
     "@prisma/client": "^7.9.1",
-    "dotenv": "^17.4.2",
-    "express": "^5.2.1",
-    "prisma": "^6.12.0",
-    "zod": "^4.5.4",
-     "bcrypt": "^6.0.0",
+    "bcrypt": "^6.0.0",
     "cloudinary": "^1.41.3",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.6",
-    "express-rate-limit": "^8.6.2"
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "express-rate-limit": "^8.7.0",
+    "jsonwebtoken": "^9.0.3",
+    "prisma": "^6.12.0",
+    "zod": "^4.5.4"
   }
 }
