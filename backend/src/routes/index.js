@@ -8,6 +8,7 @@ import categoryRoutes from "../module/category/category.routes.js";
 import budgetRoutes from "../module/budget/budget.routes.js";
 import goalRoutes from "../module/goal/goal.routes.js";
 import dashboardRoutes from "../module/dashboard/dashboard.routes.js";
+import notificationRoutes from "../module/notification/notification.routes.js";
 
 const router = express.Router();
 
@@ -19,5 +20,6 @@ router.use("/categories", categoryRoutes);
 router.use("/budgets", budgetRoutes);
 router.use("/goals", goalRoutes);
 router.use("/dashboard", dashboardRoutes);
+router.use("/notifications", notificationRoutes);
 
 export default router;

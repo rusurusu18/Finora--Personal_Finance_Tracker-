@@ -1,9 +1,9 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
-import Button from '../../ui/Button'
-import Card from '../../ui/Card'
-import Input from '../../ui/Input'
+import Button from '../../components/ui/Button'
+import Card from '../../components/ui/Card'
+import Input from '../../components/ui/Input'
 
 export default function Register() {
   const { register } = useAuth()
@@ -33,7 +33,6 @@ export default function Register() {
   return (
     <Card className="p-6">
       <h1 className="text-xl font-semibold">Create your Finora account</h1>
-      <p className="mt-1 text-sm text-slate-500">Validation runs in the browser. Later this will call POST /api/auth/register.</p>
       <form className="mt-6 space-y-4" onSubmit={handleSubmit} noValidate>
         <Input id="name" name="name" label="Full name" value={form.name} error={errors.name} onChange={update} />
         <Input

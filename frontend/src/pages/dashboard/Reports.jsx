@@ -1,9 +1,9 @@
 import { useMemo, useState } from 'react'
 import { useFinance } from '../../hooks/useFinance'
-import { useToast } from '../../ui/Toast'
-import Button from '../../ui/Button'
-import Select from '../../ui/Select'
-import SectionCard from '../../sections/SectionCard'
+import { useToast } from '../../components/ui/Toast'
+import Button from '../../components/ui/Button'
+import Select from '../../components/ui/Select'
+import SectionCard from '../../components/sections/SectionCard'
 import { REPORT_PERIODS } from '../../utils/constants'
 import { downloadCsv, formatCurrency, formatDate } from '../../utils/helpers'
 

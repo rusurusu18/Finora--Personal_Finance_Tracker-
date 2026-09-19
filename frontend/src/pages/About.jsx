@@ -1,39 +1,59 @@
 import { useNavigate } from 'react-router-dom'
+import {
+  FiGlobe,
+  FiEye,
+  FiShield,
+  FiTrendingUp,
+  FiMonitor,
+  FiCode,
+  FiServer,
+  FiDatabase,
+  FiLock,
+  FiCheckCircle,
+} from 'react-icons/fi'
 
 const values = [
   {
-    icon: '🇳🇵',
     title: 'Nepal-First',
     description:
       'Built for the Nepali financial reality — NPR-native, multi-source wallet support, and local spending patterns at the core.',
+    icon: FiGlobe,
+    color: '#ef4444',
+    background: '#fef2f2',
   },
   {
-    icon: '🔍',
     title: 'Radical Clarity',
     description:
       'No jargon, no clutter. Every chart, card, and number is designed to tell you one thing: where your money actually is.',
+    icon: FiEye,
+    color: '#3b82f6',
+    background: '#eff6ff',
   },
   {
-    icon: '🔒',
     title: 'Privacy by Design',
     description:
       'Your financial data stays yours. Zero third-party selling, JWT-secured sessions, and encrypted credentials.',
+    icon: FiShield,
+    color: '#10b981',
+    background: '#ecfdf5',
   },
   {
-    icon: '🚀',
     title: 'Always Improving',
     description:
       'Finora ships iteratively. Features are added based on real user feedback, not investor decks.',
+    icon: FiTrendingUp,
+    color: '#8b5cf6',
+    background: '#f5f3ff',
   },
 ]
 
 const stack = [
-  { label: 'Frontend', tech: 'React + Vite' },
-  { label: 'Styling', tech: 'Vanilla CSS + CSS Variables' },
-  { label: 'Backend', tech: 'Node.js + Express' },
-  { label: 'Database', tech: 'PostgreSQL + Prisma' },
-  { label: 'Auth', tech: 'JWT (Access + Refresh tokens)' },
-  { label: 'Validation', tech: 'Zod' },
+  { label: 'Frontend', tech: 'React + Vite', icon: FiMonitor },
+  { label: 'Styling', tech: 'Vanilla CSS + CSS Variables', icon: FiCode },
+  { label: 'Backend', tech: 'Node.js + Express', icon: FiServer },
+  { label: 'Database', tech: 'PostgreSQL + Prisma', icon: FiDatabase },
+  { label: 'Auth', tech: 'JWT (Access + Refresh tokens)', icon: FiLock },
+  { label: 'Validation', tech: 'Zod', icon: FiCheckCircle },
 ]
 
 export default function About() {
@@ -100,10 +120,20 @@ export default function About() {
             Four principles guide every decision we make at Finora.
           </p>
           <div className="about-values-grid">
-            {values.map(({ icon, title, description }) => (
+            {values.map(({ icon: Icon, title, description, color, background }) => (
               <div key={title} className="about-value-card">
-                <span className="about-value-icon">{icon}</span>
+                <div
+                  className="about-value-icon"
+                  style={{
+                    color,
+                    background,
+                  }}
+                >
+                  <Icon />
+                </div>
+
                 <h3 className="about-value-title">{title}</h3>
+
                 <p className="about-value-desc">{description}</p>
               </div>
             ))}
@@ -119,13 +149,22 @@ export default function About() {
             Boring, proven technology — because your money deserves reliability over hype.
           </p>
           <div className="about-stack-grid">
-            {stack.map(({ label, tech }) => (
+            {stack.map(({ label, tech, icon: Icon }) => (
               <div key={label} className="about-stack-row">
-                <span className="about-stack-label">{label}</span>
-                <span className="about-stack-tech">{tech}</span>
+                <div className="about-stack-left">
+                  <div className="about-stack-icon">
+                    <Icon />
+                  </div>
+
+                  <div>
+                    <span className="about-stack-label">{label}</span>
+                    <span className="about-stack-tech">{tech}</span>
+                  </div>
+                </div>
               </div>
             ))}
           </div>
+
         </div>
       </section>
 
@@ -286,10 +325,15 @@ export default function About() {
           border-color: var(--color-primary, #6366f1);
         }
         .about-value-icon {
-          font-size: 2rem;
-          display: block;
-          margin-bottom: 0.75rem;
-        }
+        width: 48px;
+        height: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 12px;
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+}
         .about-value-title {
           font-size: 1rem;
           font-weight: 700;
@@ -334,6 +378,39 @@ export default function About() {
           background: var(--color-surface, #f1f5f9);
           padding: 0.25rem 0.75rem;
           border-radius: 999px;
+        }
+        .about-stack-left {
+         display: flex;
+         align-items: center;
+         gap: 1rem;
+        }
+        .about-stack-icon {
+         width: 42px;
+         height: 42px;
+         display: flex;
+         align-items: center;
+         justify-content: center;
+         flex-shrink: 0;
+         border-radius: 10px;
+         background: var(--color-surface, #f1f5f9);
+         color: var(--color-primary, #6366f1);
+         font-size: 1.2rem;
+        }
+        .about-stack-label {
+        display: block;
+        font-size: 0.8rem;
+        color: var(--color-text-muted, #64748b);
+        font-weight: 500;
+        }
+        .about-stack-tech {
+        display: block;
+        margin-top: 0.2rem;
+        background: none;
+        padding: 0;
+        border-radius: 0;
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: var(--color-text, #0f172a);
         }
 
         /* CTA */

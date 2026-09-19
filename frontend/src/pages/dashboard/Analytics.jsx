@@ -1,9 +1,9 @@
 import { useFinance } from '../../hooks/useFinance'
-import AreaChart from '../../sections/AreaChart'
-import BarChart from '../../sections/BarChart'
-import DonutChart from '../../sections/DonutChart'
-import SectionCard from '../../sections/SectionCard'
-import FinancialInsight from '../../finance/FinancialInsight'
+import AreaChart from '../../components/sections/AreaChart'
+import BarChart from '../../components/sections/BarChart'
+import DonutChart from '../../components/sections/DonutChart'
+import SectionCard from '../../components/sections/SectionCard'
+import FinancialInsight from '../../components/finance/FinancialInsight'
 import { getCategorySpending, getMonthlyTrend, getSourceSpending } from '../../utils/dashboardData'
 
 export default function Analytics() {

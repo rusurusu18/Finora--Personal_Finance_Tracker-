@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import Button from '../../ui/Button'
+import Button from '../../components/ui/Button'
 import { useAuth } from '../../contexts/AuthContext'
 
 export default function Profile() {

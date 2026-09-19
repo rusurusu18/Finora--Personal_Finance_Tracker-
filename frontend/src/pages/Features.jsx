@@ -1,4 +1,4 @@
-import FeaturesSection from '../HomePageComponent/FeaturesSection'
+import FeaturesSection from '../components/HomePageComponent/FeaturesSection'
 
 export default function Features() {
   return (

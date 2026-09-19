@@ -1,12 +1,12 @@
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
-import CtaSection from '../HomePageComponent/CtaSection'
-import FeaturesSection from '../HomePageComponent/FeaturesSection'
-import FinancialPreviewSection from '../HomePageComponent/FinancialPreviewSection'
-import HeroSection from '../HomePageComponent/HeroSection'
-import HowItWorksSection from '../HomePageComponent/HowItWorksSection'
-import NepalFirstSection from '../HomePageComponent/NepalFirstSection'
-import TestimonialsSection from '../HomePageComponent/TestimonialsSection'
+import CtaSection from '../components/HomePageComponent/CtaSection'
+import FeaturesSection from '../components/HomePageComponent/FeaturesSection'
+import FinancialPreviewSection from '../components/HomePageComponent/FinancialPreviewSection'
+import HeroSection from '../components/HomePageComponent/HeroSection'
+import HowItWorksSection from '../components/HomePageComponent/HowItWorksSection'
+import NepalFirstSection from '../components/HomePageComponent/NepalFirstSection'
+import TestimonialsSection from '../components/HomePageComponent/TestimonialsSection'
 
 export default function Home() {
   const navigate = useNavigate()

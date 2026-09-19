@@ -1,12 +1,12 @@
 import { useState } from 'react'
 import { useFinance } from '../../hooks/useFinance'
-import { useToast } from '../../ui/Toast'
-import SavingsGoalCard from '../../finance/SavingsGoalCard'
-import FinancialInsight from '../../finance/FinancialInsight'
-import Button from '../../ui/Button'
-import ConfirmDialog from '../../ui/ConfirmDialog'
-import Input from '../../ui/Input'
-import Modal from '../../ui/Modal'
+import { useToast } from '../../components/ui/Toast'
+import SavingsGoalCard from '../../components/finance/SavingsGoalCard'
+import FinancialInsight from '../../components/finance/FinancialInsight'
+import Button from '../../components/ui/Button'
+import ConfirmDialog from '../../components/ui/ConfirmDialog'
+import Input from '../../components/ui/Input'
+import Modal from '../../components/ui/Modal'
 
 export default function SavingsGoals() {
   const { savingsGoals, settings, addGoal, editGoal, removeGoal } = useFinance()

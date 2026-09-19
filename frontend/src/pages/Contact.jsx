@@ -1,8 +1,16 @@
 import { useState } from 'react'
-import Button from '../ui/Button'
-import Card from '../ui/Card'
-import Input from '../ui/Input'
+import Button from '../components/ui/Button'
+import Card from '../components/ui/Card'
+import Input from '../components/ui/Input'
 import { isEmail, isName, isRequired } from '../utils/validators'
+import {
+  FiMail,
+  FiUser,
+  FiAtSign,
+  FiMessageSquare,
+  FiSend,
+  FiCheckCircle,
+} from 'react-icons/fi'
 
 export default function Contact() {
   const [form, setForm] = useState({ name: '', email: '', message: '' })
@@ -10,60 +18,138 @@ export default function Contact() {
   const [sent, setSent] = useState(false)
 
   function update(event) {
-    setForm((current) => ({ ...current, [event.target.name]: event.target.value }))
+    setForm((current) => ({
+      ...current,
+      [event.target.name]: event.target.value,
+    }))
   }
 
   function handleSubmit(event) {
     event.preventDefault()
+
     const nextErrors = {
       name: isName(form.name, 'Name'),
       email: isEmail(form.email),
       message: isRequired(form.message, 'Message'),
     }
+
     setErrors(nextErrors)
+
     if (Object.values(nextErrors).some(Boolean)) {
       setSent(false)
       return
     }
+
     setSent(true)
   }
 
   return (
     <main className="mx-auto max-w-3xl px-4 py-16">
-      <h1 className="text-3xl font-semibold tracking-tight">Contact</h1>
-      <p className="mt-2 text-slate-600 dark:text-slate-300">
-        This form stays on the frontend. Messages are not sent to a server yet.
-      </p>
-      <Card className="mt-8 p-6">
-        <form className="space-y-4" onSubmit={handleSubmit} noValidate>
-          <Input id="name" name="name" label="Name" value={form.name} error={errors.name} onChange={update} />
-          <Input
-            id="email"
-            name="email"
-            type="email"
-            label="Email"
-            value={form.email}
-            error={errors.email}
-            onChange={update}
-          />
+      {/* Header */}
+      <div className="text-center">
+        <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-100 text-blue-600 dark:bg-blue-950 dark:text-blue-400">
+          <FiMail className="h-7 w-7" />
+        </div>
+
+        <h1 className="mt-5 text-3xl font-semibold tracking-tight">
+          Get in touch
+        </h1>
+
+        <p className="mx-auto mt-3 max-w-xl text-slate-600 dark:text-slate-300">
+          Have a question, suggestion, or feedback? Send us a message and
+          we'll get back to you soon.
+        </p>
+      </div>
+
+      {/* Contact Card */}
+      <Card className="mt-10 p-6 shadow-sm transition-shadow duration-300 hover:shadow-lg sm:p-8">
+        <form className="space-y-5" onSubmit={handleSubmit} noValidate>
+          {/* Name */}
+          <div>
+            <div className="mb-1.5 flex items-center gap-2">
+              <FiUser className="h-4 w-4 text-slate-500" />
+              <span className="text-sm font-medium">Name</span>
+            </div>
+
+            <Input
+              id="name"
+              name="name"
+              label=""
+              value={form.name}
+              error={errors.name}
+              onChange={update}
+            />
+          </div>
+
+          {/* Email */}
+          <div>
+            <div className="mb-1.5 flex items-center gap-2">
+              <FiAtSign className="h-4 w-4 text-slate-500" />
+              <span className="text-sm font-medium">Email</span>
+            </div>
+
+            <Input
+              id="email"
+              name="email"
+              type="email"
+              label=""
+              value={form.email}
+              error={errors.email}
+              onChange={update}
+            />
+          </div>
+
+          {/* Message */}
           <label className="block" htmlFor="message">
-            <span className="mb-1.5 block text-sm font-medium">Message</span>
+            <span className="mb-1.5 flex items-center gap-2 text-sm font-medium">
+              <FiMessageSquare className="h-4 w-4 text-slate-500" />
+              Message
+            </span>
+
             <textarea
               id="message"
               name="message"
-              rows={5}
+              rows={6}
               value={form.message}
               onChange={update}
-              className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm dark:border-slate-600 dark:bg-slate-900"
+              placeholder="Tell us how we can help..."
+              className="w-full resize-none rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-slate-600 dark:bg-slate-900 dark:focus:border-blue-400"
             />
-            {errors.message ? <span className="mt-1 block text-sm text-red-600">{errors.message}</span> : null}
+
+            {errors.message ? (
+              <span className="mt-1 block text-sm text-red-600">
+                {errors.message}
+              </span>
+            ) : null}
           </label>
-          <Button type="submit">Send message</Button>
+
+          {/* Submit */}
+          <Button
+            type="submit"
+            className="flex w-full items-center justify-center gap-2"
+          >
+            <FiSend className="h-4 w-4" />
+            Send message
+          </Button>
         </form>
+
+        {/* Success message */}
         {sent ? (
-          <p className="mt-4 text-sm text-emerald-600" role="status">
-            Thanks. In production this would create a support request.
-          </p>
+          <div
+            className="mt-5 flex items-start gap-3 rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-emerald-700 dark:border-emerald-900 dark:bg-emerald-950/40 dark:text-emerald-400"
+            role="status"
+          >
+            <FiCheckCircle className="mt-0.5 h-5 w-5 shrink-0" />
+
+            <div>
+              <p className="text-sm font-medium">
+                Message sent successfully
+              </p>
+              <p className="mt-1 text-sm">
+                Thank you for contacting us. We'll get back to you soon.
+              </p>
+            </div>
+          </div>
         ) : null}
       </Card>
     </main>

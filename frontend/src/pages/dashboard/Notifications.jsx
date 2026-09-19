@@ -1,7 +1,7 @@
 import { useFinance } from '../../hooks/useFinance'
-import Badge from '../../ui/Badge'
-import Card from '../../ui/Card'
-import Button from '../../ui/Button'
+import Badge from '../../components/ui/Badge'
+import Card from '../../components/ui/Card'
+import Button from '../../components/ui/Button'
 
 export default function Notifications() {
   const { notifications, readNotification } = useFinance()

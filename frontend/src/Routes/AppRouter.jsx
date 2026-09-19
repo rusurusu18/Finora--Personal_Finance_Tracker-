@@ -1,9 +1,9 @@
 import { Navigate, Route, Routes } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 
-import AdminLayout from '../layout/AdminLayout'
-import AuthLayout from '../layout/AuthLayout'
-import Layout from '../layout/Layout'
+import AdminLayout from '../components/layout/AdminLayout'
+import AuthLayout from '../components/layout/AuthLayout'
+import Layout from '../components/layout/Layout'
 
 import About from '../pages/About'
 import Contact from '../pages/Contact'
