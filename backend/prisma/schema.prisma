@@ -88,15 +88,18 @@ model Account {
   name      String
   type      AccountType
   balance   Decimal     @default(0) @db.Decimal(15, 2)
-  currency  String      @default("NPR")
-  icon      String?
-  color     String?
-  createdAt DateTime    @default(now())
-  updatedAt DateTime    @updatedAt
+  currency    String      @default("NPR")
+  institution String?
+  icon        String?
+  color       String?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
 
   user           User          @relation(fields: [userId], references: [id], onDelete: Cascade)
   transactions   Transaction[] @relation("AccountTransactions")
   toTransactions Transaction[] @relation("ToAccountTransactions")
+
+  @@index([userId])
 }
 
 
@@ -118,6 +121,8 @@ model Category {
   user         User?         @relation(fields: [userId], references: [id], onDelete: Cascade)
   transactions Transaction[]
   budgets      Budget[]
+
+  @@index([userId, type])
 }
 
 
@@ -143,6 +148,10 @@ model Transaction {
   account   Account   @relation("AccountTransactions", fields: [accountId], references: [id], onDelete: Cascade)
   toAccount Account?  @relation("ToAccountTransactions", fields: [toAccountId], references: [id], onDelete: SetNull)
   category  Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+
+  @@index([userId, date])
+  @@index([userId, type])
+  @@index([accountId])
 }
 
 
@@ -163,6 +172,8 @@ model Budget {
 
   user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   category Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }
 
 
