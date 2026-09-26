@@ -2,10 +2,7 @@ import * as accountService from "./account.service.js";
 import { successResponse, createdResponse } from "../../utils/apiResponse.js";
 
 
-// ==========================================
 // LIST ACCOUNTS
-// ==========================================
-
 export const getAccounts = async (req, res, next) => {
     try {
         const result = await accountService.getAccounts(req.user.id);
@@ -15,11 +12,7 @@ export const getAccounts = async (req, res, next) => {
     }
 };
 
-
-// ==========================================
 // GET SINGLE ACCOUNT
-// ==========================================
-
 export const getAccount = async (req, res, next) => {
     try {
         const account = await accountService.getAccount(req.user.id, req.params.id);
@@ -30,10 +23,7 @@ export const getAccount = async (req, res, next) => {
 };
 
 
-// ==========================================
 // CREATE ACCOUNT
-// ==========================================
-
 export const createAccount = async (req, res, next) => {
     try {
         const account = await accountService.createAccount(req.user.id, req.body);
@@ -43,11 +33,7 @@ export const createAccount = async (req, res, next) => {
     }
 };
 
-
-// ==========================================
 // UPDATE ACCOUNT
-// ==========================================
-
 export const updateAccount = async (req, res, next) => {
     try {
         const account = await accountService.updateAccount(req.user.id, req.params.id, req.body);
@@ -57,11 +43,7 @@ export const updateAccount = async (req, res, next) => {
     }
 };
 
-
-// ==========================================
 // DELETE ACCOUNT
-// ==========================================
-
 export const deleteAccount = async (req, res, next) => {
     try {
         const result = await accountService.deleteAccount(req.user.id, req.params.id);

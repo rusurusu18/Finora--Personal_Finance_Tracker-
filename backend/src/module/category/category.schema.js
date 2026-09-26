@@ -24,9 +24,9 @@ export const createCategorySchema = z.object({
 
     icon: z
         .string()
-        .max(10, "Icon must not exceed 10 characters")
+        .max(20, "Icon must not exceed 20 characters")
         .optional()
-        .default("📦")
+        .default("FiPackage")
 });
 
 
@@ -49,6 +49,6 @@ export const updateCategorySchema = z.object({
 
     icon: z
         .string()
-        .max(10)
+        .max(20)
         .optional()
 });

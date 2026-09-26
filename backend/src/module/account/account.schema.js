@@ -1,10 +1,6 @@
 import { z } from "zod";
 
-
-// ==========================================
 // CREATE ACCOUNT
-// ==========================================
-
 export const createAccountSchema = z.object({
 
     name: z

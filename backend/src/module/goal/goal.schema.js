@@ -1,9 +1,8 @@
 import { z } from "zod";
 
 
-// ==========================================
+
 // CREATE GOAL
-// ==========================================
 
 export const createGoalSchema = z.object({
 
@@ -34,10 +33,7 @@ export const createGoalSchema = z.object({
 });
 
 
-// ==========================================
 // UPDATE GOAL
-// ==========================================
-
 export const updateGoalSchema = z.object({
 
     name: z
@@ -73,10 +69,7 @@ export const updateGoalSchema = z.object({
 });
 
 
-// ==========================================
 // DEPOSIT TO GOAL
-// ==========================================
-
 export const depositSchema = z.object({
     amount: z
         .number()

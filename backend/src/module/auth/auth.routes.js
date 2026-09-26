@@ -21,10 +21,7 @@ import { authenticate }
 
 const router = express.Router();
 
-
-// ==========================================
 // PUBLIC ROUTES
-// ==========================================
 
 // Register
 router.post(
@@ -65,18 +62,13 @@ router.post(
     authController.resetPassword
 );
 
-
-// ==========================================
 // PROTECTED ROUTES
-// ==========================================
-
 // Get current user's profile
 router.get(
     "/profile",
     authenticate,
     authController.getProfile
 );
-
 
 // Change password
 router.post(
@@ -85,7 +77,6 @@ router.post(
     validate(changePasswordSchema),
     authController.changePassword
 );
-
 
 // Logout
 router.post(

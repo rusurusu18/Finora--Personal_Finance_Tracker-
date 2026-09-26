@@ -1,10 +1,7 @@
 import rateLimit from "express-rate-limit";
 
 
-// ==========================================
-// HELPERS
-// ==========================================
-
+//HELPERS
 const rateLimitHandler = (req, res) => {
     return res.status(429).json({
         success: false,
@@ -13,10 +10,7 @@ const rateLimitHandler = (req, res) => {
 };
 
 
-// ==========================================
 // GENERAL API LIMITER
-// ==========================================
-
 export const generalLimiter = rateLimit({
     windowMs         : 15 * 60 * 1000, // 15 minutes
     max              : 200,
@@ -25,11 +19,7 @@ export const generalLimiter = rateLimit({
     handler          : rateLimitHandler
 });
 
-
-// ==========================================
 // AUTH LIMITER (strict)
-// ==========================================
-
 export const authLimiter = rateLimit({
     windowMs         : 15 * 60 * 1000, // 15 minutes
     max              : 20,
@@ -38,11 +28,7 @@ export const authLimiter = rateLimit({
     handler          : rateLimitHandler
 });
 
-
-// ==========================================
 // FORGOT PASSWORD LIMITER (very strict)
-// ==========================================
-
 export const forgotPasswordLimiter = rateLimit({
     windowMs         : 60 * 60 * 1000, // 1 hour
     max              : 5,

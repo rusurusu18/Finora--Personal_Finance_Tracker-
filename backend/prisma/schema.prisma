@@ -113,7 +113,7 @@ model Category {
   name      String
   type      CategoryType
   color     String       @default("#6366f1")
-  icon      String       @default("📦")
+  icon      String       @default("FiPackage")
   isDefault Boolean      @default(false)
   createdAt DateTime     @default(now())
   updatedAt DateTime     @updatedAt

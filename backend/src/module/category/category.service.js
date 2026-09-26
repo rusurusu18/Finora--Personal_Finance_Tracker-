@@ -62,7 +62,7 @@ export const createCategory = async (userId, data) => {
             name     : data.name,
             type     : data.type,
             color    : data.color ?? "#6366f1",
-            icon     : data.icon  ?? "📦",
+            icon     : data.icon  ?? "FiPackage",
             isDefault: false
         }
     });
@@ -127,7 +127,23 @@ export const seedDefaultCategories = async () => {
         where: { isDefault: true }
     });
 
-    if (existing) return { message: "Default categories already seeded" };
+    if (existing) {
+        for (const category of DEFAULT_INCOME_CATEGORIES) {
+            await prisma.category.updateMany({
+                where: { userId: null, isDefault: true, type: "INCOME", name: category.name },
+                data: { icon: category.icon }
+            });
+        }
+
+        for (const category of DEFAULT_EXPENSE_CATEGORIES) {
+            await prisma.category.updateMany({
+                where: { userId: null, isDefault: true, type: "EXPENSE", name: category.name },
+                data: { icon: category.icon }
+            });
+        }
+
+        return { message: "Default categories already seeded" };
+    }
 
     const incomeData  = DEFAULT_INCOME_CATEGORIES.map(c => ({
         ...c, type: "INCOME", isDefault: true, userId: null
