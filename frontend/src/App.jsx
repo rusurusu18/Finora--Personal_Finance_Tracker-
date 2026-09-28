@@ -3,6 +3,7 @@ import { FinanceProvider } from './contexts/FinanceContext'
 import { ThemeProvider } from './contexts/ThemeContext'
 import AppRouter from './Routes/AppRouter'
 import { ToastProvider } from './components/ui/Toast'
+import Chatbot from './components/ui/Chatbot'
 
 export default function App() {
   return (
@@ -11,6 +12,7 @@ export default function App() {
         <FinanceProvider>
           <ToastProvider>
             <AppRouter />
+            <Chatbot />
           </ToastProvider>
         </FinanceProvider>
       </AuthProvider>

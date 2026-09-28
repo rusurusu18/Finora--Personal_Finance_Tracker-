@@ -3,7 +3,6 @@
 
 generator client {
   provider = "prisma-client-js"
-  output   = "../generated/prisma"
 }
 
 datasource db {
@@ -50,6 +49,12 @@ enum CategoryType {
   EXPENSE
 }
 
+enum NotificationType {
+  INFO
+  SUCCESS
+  WARNING
+  ALERT
+}
 
 // ==========================================
 // USER
