@@ -26,5 +26,8 @@
     "jsonwebtoken": "^9.0.3",
     "prisma": "^6.19.3",
     "zod": "^4.5.4"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.3"
   }
 }
