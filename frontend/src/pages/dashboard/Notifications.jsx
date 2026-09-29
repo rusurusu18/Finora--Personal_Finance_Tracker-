@@ -10,9 +10,12 @@ export default function Notifications() {
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-semibold tracking-tight">Notifications</h1>
-        <p className="text-sm text-slate-500">Preview alerts generated from mock finance activity.</p>
+        <p className="text-sm text-slate-500">Updates related to your account and financial activity.</p>
       </div>
       <div className="space-y-3">
+        {notifications.length === 0 ? (
+          <p className="py-10 text-center text-sm text-slate-500">No notifications yet.</p>
+        ) : null}
         {notifications.map((item) => (
           <Card key={item.id} className="p-5">
             <div className="flex flex-wrap items-start justify-between gap-3">

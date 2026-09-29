@@ -1,173 +1,187 @@
 import { STORAGE_KEYS } from '../utils/constants'
-import {
-  seedAccounts,
-  seedBudgets,
-  seedNotifications,
-  seedSavingsGoals,
-  seedTransactions,
-} from '../utils/dummyData'
-import { nextId } from '../utils/helpers'
 
-function read(key, fallback) {
-  try {
-    const raw = localStorage.getItem(key)
-    if (!raw) {
-      localStorage.setItem(key, JSON.stringify(fallback))
-      return structuredClone(fallback)
-    }
-    return JSON.parse(raw)
-  } catch {
-    return structuredClone(fallback)
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api/v1'
+
+export async function apiRequest(path, options = {}) {
+  const accessToken = localStorage.getItem(STORAGE_KEYS.accessToken)
+  const response = await fetch(`${API_BASE_URL}${path}`, {
+    ...options,
+    headers: {
+      ...(options.body ? { 'Content-Type': 'application/json' } : {}),
+      ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
+      ...options.headers,
+    },
+  })
+  const body = await response.json().catch(() => ({}))
+
+  if (!response.ok || body.success === false) {
+    throw new Error(body.message || 'The request could not be completed.')
+  }
+
+  return body
+}
+
+const getData = async (path, options) => (await apiRequest(path, options)).data
+const json = (method, payload) => ({ method, body: JSON.stringify(payload) })
+
+function mapAccount(account) {
+  return {
+    ...account,
+    type: account.type.toLowerCase(),
+    balance: Number(account.balance),
+    provider: account.institution,
   }
 }
 
-function write(key, value) {
-  localStorage.setItem(key, JSON.stringify(value))
-  return value
+function mapCategory(category) {
+  return { ...category, type: category.type.toLowerCase() }
 }
 
-function seedIfEmpty() {
-  read(STORAGE_KEYS.transactions, seedTransactions)
-  read(STORAGE_KEYS.accounts, seedAccounts)
-  read(STORAGE_KEYS.budgets, seedBudgets)
-  read(STORAGE_KEYS.savingsGoals, seedSavingsGoals)
-  read(STORAGE_KEYS.notifications, seedNotifications)
+function mapTransaction(transaction) {
+  return {
+    ...transaction,
+    title: transaction.description,
+    description: transaction.notes || '',
+    amount: Number(transaction.amount),
+    type: transaction.type.toLowerCase(),
+    category: transaction.category?.name || '',
+    paymentSource: transaction.paymentSource || transaction.account?.institution || transaction.account?.name || '',
+    date: new Date(transaction.date).toISOString().slice(0, 10),
+  }
 }
-
-seedIfEmpty()
-
-/*
-  Service layer — currently localStorage + mock data.
-  Later, swap the body of each function to fetch('/api/...').
-  UI components should keep calling these functions.
-*/
 
 export async function getTransactions() {
-  return read(STORAGE_KEYS.transactions, seedTransactions)
+  const transactions = []
+  let page = 1
+  let hasNextPage = true
+  while (hasNextPage) {
+    const response = await apiRequest(`/transactions?page=${page}&limit=100`)
+    transactions.push(...response.data.map(mapTransaction))
+    hasNextPage = Boolean(response.meta?.hasNextPage)
+    page += 1
+  }
+  return transactions
 }
 
 export async function createTransaction(payload) {
-  const items = await getTransactions()
-  const item = { id: nextId(items), userId: 1, ...payload }
-  write(STORAGE_KEYS.transactions, [item, ...items])
-  return item
+  const transaction = await getData('/transactions', json('POST', {
+    accountId: payload.accountId,
+    categoryId: payload.categoryId || null,
+    type: payload.type.toUpperCase(),
+    amount: Number(payload.amount),
+    description: payload.title || payload.description,
+    notes: payload.description || null,
+    paymentSource: payload.paymentSource,
+    date: new Date(`${payload.date}T00:00:00.000Z`).toISOString(),
+  }))
+  return mapTransaction(transaction)
 }
 
 export async function updateTransaction(id, payload) {
-  const items = await getTransactions()
-  const next = items.map((item) => (item.id === id ? { ...item, ...payload } : item))
-  write(STORAGE_KEYS.transactions, next)
-  return next.find((item) => item.id === id)
+  const transaction = await getData(`/transactions/${id}`, json('PATCH', {
+    accountId: payload.accountId,
+    type: payload.type.toUpperCase(),
+    categoryId: payload.categoryId || null,
+    amount: Number(payload.amount),
+    description: payload.title || payload.description,
+    paymentSource: payload.paymentSource,
+    notes: payload.description || null,
+    date: new Date(`${payload.date}T00:00:00.000Z`).toISOString(),
+  }))
+  return mapTransaction(transaction)
 }
 
 export async function deleteTransaction(id) {
-  const items = await getTransactions()
-  write(
-    STORAGE_KEYS.transactions,
-    items.filter((item) => item.id !== id),
-  )
-  return { id }
+  return getData(`/transactions/${id}`, { method: 'DELETE' })
 }
 
 export async function getAccounts() {
-  return read(STORAGE_KEYS.accounts, seedAccounts)
+  const response = await getData('/accounts')
+  return response.accounts.map(mapAccount)
 }
 
 export async function createAccount(payload) {
-  const items = await getAccounts()
-  const item = { id: nextId(items), userId: 1, currency: 'NPR', ...payload }
-  write(STORAGE_KEYS.accounts, [...items, item])
-  return item
+  const account = await getData('/accounts', json('POST', {
+    name: payload.name,
+    type: payload.type.toUpperCase(),
+    balance: Number(payload.balance || 0),
+    currency: payload.currency || 'NPR',
+    institution: payload.institution || payload.provider || null,
+  }))
+  return mapAccount(account)
 }
 
 export async function updateAccount(id, payload) {
-  const items = await getAccounts()
-  const next = items.map((item) => (item.id === id ? { ...item, ...payload } : item))
-  write(STORAGE_KEYS.accounts, next)
-  return next.find((item) => item.id === id)
+  const account = await getData(`/accounts/${id}`, json('PATCH', {
+    name: payload.name,
+    type: payload.type.toUpperCase(),
+    balance: Number(payload.balance),
+    institution: payload.institution || payload.provider || null,
+  }))
+  return mapAccount(account)
 }
 
 export async function deleteAccount(id) {
-  const items = await getAccounts()
-  write(
-    STORAGE_KEYS.accounts,
-    items.filter((item) => item.id !== id),
-  )
-  return { id }
+  return getData(`/accounts/${id}`, { method: 'DELETE' })
 }
 
 export async function getBudgets() {
-  return read(STORAGE_KEYS.budgets, seedBudgets)
+  return (await getData('/budgets')).map(mapBudget)
 }
 
 export async function createBudget(payload) {
-  const items = await getBudgets()
-  const item = { id: nextId(items), userId: 1, spent: 0, ...payload }
-  write(STORAGE_KEYS.budgets, [...items, item])
-  return item
+  const { startDate, endDate } = budgetDates(payload.period)
+  return mapBudget(await getData('/budgets', json('POST', {
+    categoryId: payload.categoryId,
+    amount: Number(payload.amount),
+    period: 'MONTHLY',
+    startDate,
+    endDate,
+  })))
 }
 
 export async function updateBudget(id, payload) {
-  const items = await getBudgets()
-  const next = items.map((item) => (item.id === id ? { ...item, ...payload } : item))
-  write(STORAGE_KEYS.budgets, next)
-  return next.find((item) => item.id === id)
+  const { startDate, endDate } = budgetDates(payload.period)
+  return mapBudget(await getData(`/budgets/${id}`, json('PATCH', {
+    categoryId: payload.categoryId,
+    amount: Number(payload.amount),
+    period: 'MONTHLY',
+    startDate,
+    endDate,
+  })))
 }
 
 export async function deleteBudget(id) {
-  const items = await getBudgets()
-  write(
-    STORAGE_KEYS.budgets,
-    items.filter((item) => item.id !== id),
-  )
-  return { id }
+  return getData(`/budgets/${id}`, { method: 'DELETE' })
 }
 
 export async function getSavingsGoals() {
-  return read(STORAGE_KEYS.savingsGoals, seedSavingsGoals)
+  return (await getData('/goals')).map(mapGoal)
 }
 
 export async function createSavingsGoal(payload) {
-  const items = await getSavingsGoals()
-  const item = { id: nextId(items), userId: 1, currentAmount: 0, ...payload }
-  write(STORAGE_KEYS.savingsGoals, [...items, item])
-  return item
+  return mapGoal(await getData('/goals', json('POST', goalPayload(payload))))
 }
 
 export async function updateSavingsGoal(id, payload) {
-  const items = await getSavingsGoals()
-  const next = items.map((item) => (item.id === id ? { ...item, ...payload } : item))
-  write(STORAGE_KEYS.savingsGoals, next)
-  return next.find((item) => item.id === id)
+  return mapGoal(await getData(`/goals/${id}`, json('PATCH', goalPayload(payload))))
 }
 
 export async function deleteSavingsGoal(id) {
-  const items = await getSavingsGoals()
-  write(
-    STORAGE_KEYS.savingsGoals,
-    items.filter((item) => item.id !== id),
-  )
-  return { id }
+  return getData(`/goals/${id}`, { method: 'DELETE' })
 }
 
 export async function getNotifications() {
-  return read(STORAGE_KEYS.notifications, seedNotifications)
+  return (await getData('/notifications')).map((notification) => ({
+    ...notification,
+    read: notification.isRead,
+    body: notification.message,
+  }))
 }
 
 export async function markNotificationRead(id) {
-  const items = await getNotifications()
-  const next = items.map((item) => (item.id === id ? { ...item, read: true } : item))
-  write(STORAGE_KEYS.notifications, next)
-  return next
-}
-
-export async function resetFinanceData() {
-  write(STORAGE_KEYS.transactions, seedTransactions)
-  write(STORAGE_KEYS.accounts, seedAccounts)
-  write(STORAGE_KEYS.budgets, seedBudgets)
-  write(STORAGE_KEYS.savingsGoals, seedSavingsGoals)
-  write(STORAGE_KEYS.notifications, seedNotifications)
-  return true
+  await getData(`/notifications/${id}/read`, { method: 'PATCH' })
+  return getNotifications()
 }
 
 export async function getAnalytics() {
@@ -180,24 +194,85 @@ export async function getAnalytics() {
   return { transactions, accounts, budgets, savingsGoals }
 }
 
-export async function loginRequest(_credentials) {
-  return {
-    user: {
-      id: 1,
-      name: 'Aarav Sharma',
-      email: 'aarav@finora.dev',
-      city: 'Kathmandu',
-    },
-  }
+export async function loginRequest(credentials) {
+  const response = await apiRequest('/auth/login', {
+    method: 'POST',
+    body: JSON.stringify(credentials),
+  })
+  return response.data
 }
 
 export async function registerRequest(payload) {
-  return {
-    user: {
-      id: 1,
-      name: payload.name,
+  await apiRequest('/auth/register', {
+    method: 'POST',
+    body: JSON.stringify({
+      fullName: payload.name,
       email: payload.email,
-      city: 'Nepal',
-    },
+      password: payload.password,
+    }),
+  })
+  return loginRequest({ email: payload.email, password: payload.password })
+}
+
+export async function getCategories() {
+  return (await getData('/categories')).map(mapCategory)
+}
+
+export async function updateProfileRequest(payload) {
+  const profile = { fullName: payload.name }
+  if (payload.phone !== undefined) profile.phone = payload.phone || null
+  return getData('/users/me', json('PATCH', profile))
+}
+
+export async function changePasswordRequest(payload) {
+  return getData('/auth/change-password', json('POST', payload))
+}
+
+export async function getEsewaPlusPlan() {
+  return getData('/payments/esewa/plus-plan')
+}
+
+export async function initiateEsewaPayment() {
+  return getData('/payments/esewa/initiate', { method: 'POST' })
+}
+
+export async function verifyEsewaPayment(data) {
+  return getData('/payments/esewa/verify', json('POST', { data }))
+}
+
+function mapGoal(goal) {
+  return {
+    ...goal,
+    targetAmount: Number(goal.targetAmount),
+    currentAmount: Number(goal.currentAmount),
+    status: goal.status.toLowerCase(),
+    targetDate: goal.targetDate ? new Date(goal.targetDate).toISOString().slice(0, 10) : '',
+  }
+}
+
+function mapBudget(budget) {
+  return {
+    ...budget,
+    amount: Number(budget.amount),
+    category: budget.category.name,
+    period: budget.startDate.slice(0, 7),
+  }
+}
+
+function goalPayload(payload) {
+  return {
+    name: payload.name,
+    targetAmount: Number(payload.targetAmount),
+    currentAmount: Number(payload.currentAmount || 0),
+    targetDate: payload.targetDate ? new Date(`${payload.targetDate.slice(0, 10)}T00:00:00.000Z`).toISOString() : null,
+  }
+}
+
+function budgetDates(period) {
+  const selectedMonth = period || new Date().toISOString().slice(0, 7)
+  const [year, month] = selectedMonth.split('-').map(Number)
+  return {
+    startDate: new Date(Date.UTC(year, month - 1, 1)).toISOString(),
+    endDate: new Date(Date.UTC(year, month, 0, 23, 59, 59)).toISOString(),
   }
 }

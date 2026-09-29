@@ -8,6 +8,8 @@ export const STORAGE_KEYS = {
   savingsGoals: 'finora_savings_goals',
   notifications: 'finora_notifications',
   user: 'finora_user',
+  accessToken: 'finora_access_token',
+  refreshToken: 'finora_refresh_token',
   theme: 'finora_theme',
   settings: 'finora_settings',
 }
@@ -31,29 +33,12 @@ export const TRANSACTION_TYPES = [
   { value: 'expense', label: 'Expense' },
 ]
 
-export const CATEGORIES = [
-  { id: 1, name: 'Salary', type: 'income' },
-  { id: 2, name: 'Freelance', type: 'income' },
-  { id: 3, name: 'Food', type: 'expense' },
-  { id: 4, name: 'Transport', type: 'expense' },
-  { id: 5, name: 'Rent', type: 'expense' },
-  { id: 6, name: 'Internet', type: 'expense' },
-  { id: 7, name: 'Shopping', type: 'expense' },
-  { id: 8, name: 'Entertainment', type: 'expense' },
-  { id: 9, name: 'Education', type: 'expense' },
-  { id: 10, name: 'Utilities', type: 'expense' },
-  { id: 11, name: 'Health', type: 'expense' },
-  { id: 12, name: 'Transfer', type: 'expense' },
-]
-
 export const REPORT_PERIODS = [
   { value: 'monthly', label: 'Monthly report' },
   { value: 'yearly', label: 'Yearly report' },
   { value: 'category', label: 'Category report' },
   { value: 'income', label: 'Income report' },
   { value: 'expense', label: 'Expense report' },
-  { value: 'fiscal', label: 'Fiscal year' },
-  { value: 'bikram', label: 'Bikram Sambat' },
 ]
 
 export const NAV_PUBLIC = [

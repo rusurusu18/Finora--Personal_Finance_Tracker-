@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import Button from '../../components/ui/Button'
+import { apiRequest } from '../../config/services'
 
 export default function ResetPassword() {
   const navigate = useNavigate()
@@ -75,30 +76,13 @@ export default function ResetPassword() {
     try {
       setLoading(true)
 
-      const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/auth/reset-password`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            token,
-            password: formData.password,
-          }),
-        }
-      )
-
-      const data = await response.json()
-
-      if (!response.ok) {
-        throw new Error(
-          data.message || 'Failed to reset password.'
-        )
-      }
+      const response = await apiRequest('/auth/reset-password', {
+        method: 'POST',
+        body: JSON.stringify({ token, password: formData.password }),
+      })
 
       setMessage(
-        data.message || 'Password reset successfully.'
+        response.message || 'Password reset successfully.'
       )
 
       setFormData({

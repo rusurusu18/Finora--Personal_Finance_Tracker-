@@ -8,20 +8,24 @@ import Input from '../../components/ui/Input'
 import Modal from '../../components/ui/Modal'
 import Select from '../../components/ui/Select'
 import StatusPill from '../../components/sections/StatusPill'
-import { CATEGORIES } from '../../utils/constants'
 import { clampPercent, percent } from '../../utils/helpers'
 
 export default function Budgets() {
-  const { budgets, settings, addBudget, editBudget, removeBudget } = useFinance()
+  const { budgets, categories, settings, addBudget, editBudget, removeBudget } = useFinance()
   const { push } = useToast()
   const [open, setOpen] = useState(false)
   const [editing, setEditing] = useState(null)
   const [pending, setPending] = useState(null)
-  const [form, setForm] = useState({ category: 'Food', amount: '', spent: '', period: '2026-08' })
+  const currentPeriod = new Date().toISOString().slice(0, 7)
+  const [form, setForm] = useState({ category: '', amount: '', period: currentPeriod })
 
   function openCreate() {
     setEditing(null)
-    setForm({ category: 'Food', amount: '', spent: '0', period: '2026-08' })
+    setForm({
+      category: categories.find((item) => item.type === 'expense')?.name || '',
+      amount: '',
+      period: currentPeriod,
+    })
     setOpen(true)
   }
 
@@ -30,7 +34,6 @@ export default function Budgets() {
     setForm({
       category: budget.category,
       amount: budget.amount,
-      spent: budget.spent,
       period: budget.period,
     })
     setOpen(true)
@@ -40,8 +43,7 @@ export default function Budgets() {
     const payload = {
       ...form,
       amount: Number(form.amount),
-      spent: Number(form.spent),
-      categoryId: CATEGORIES.find((item) => item.name === form.category)?.id || 3,
+      categoryId: categories.find((item) => item.name === form.category)?.id,
     }
     if (editing) {
       await editBudget(editing.id, payload)
@@ -97,7 +99,7 @@ export default function Budgets() {
             value={form.category}
             onChange={(event) => setForm({ ...form, category: event.target.value })}
           >
-            {CATEGORIES.filter((item) => item.type === 'expense').map((item) => (
+            {categories.filter((item) => item.type === 'expense').map((item) => (
               <option key={item.id} value={item.name}>
                 {item.name}
               </option>
@@ -110,20 +112,13 @@ export default function Budgets() {
             value={form.amount}
             onChange={(event) => setForm({ ...form, amount: event.target.value })}
           />
-          <Input
-            id="budget-spent"
-            label="Spent"
-            type="number"
-            value={form.spent}
-            onChange={(event) => setForm({ ...form, spent: event.target.value })}
-          />
         </div>
       </Modal>
 
       <ConfirmDialog
         open={Boolean(pending)}
         title="Delete budget?"
-        description="This category limit will be removed from the preview data."
+        description="This budget will be permanently removed."
         confirmLabel="Delete"
         onClose={() => setPending(null)}
         onConfirm={async () => {

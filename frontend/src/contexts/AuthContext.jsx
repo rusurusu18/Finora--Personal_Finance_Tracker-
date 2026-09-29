@@ -1,5 +1,5 @@
 import { createContext, useCallback, useContext, useMemo, useState } from 'react'
-import { loginRequest, registerRequest } from '../config/services'
+import { loginRequest, registerRequest, updateProfileRequest } from '../config/services'
 import { STORAGE_KEYS } from '../utils/constants'
 import { hasErrors, validateLogin, validateRegister } from '../utils/validators'
 
@@ -7,6 +7,7 @@ export const AuthContext = createContext(null)
 
 function readUser() {
   try {
+    if (!localStorage.getItem(STORAGE_KEYS.accessToken)) return null
     const raw = localStorage.getItem(STORAGE_KEYS.user)
     return raw ? JSON.parse(raw) : null
   } catch {
@@ -19,12 +20,16 @@ export function AuthProvider({ children }) {
   const [status, setStatus] = useState('idle')
   const [error, setError] = useState('')
 
-  const persist = useCallback((nextUser) => {
+  const persist = useCallback((nextUser, tokens = {}) => {
     setUser(nextUser)
     if (nextUser) {
       localStorage.setItem(STORAGE_KEYS.user, JSON.stringify(nextUser))
+      if (tokens.accessToken) localStorage.setItem(STORAGE_KEYS.accessToken, tokens.accessToken)
+      if (tokens.refreshToken) localStorage.setItem(STORAGE_KEYS.refreshToken, tokens.refreshToken)
     } else {
       localStorage.removeItem(STORAGE_KEYS.user)
+      localStorage.removeItem(STORAGE_KEYS.accessToken)
+      localStorage.removeItem(STORAGE_KEYS.refreshToken)
     }
   }, [])
 
@@ -37,14 +42,14 @@ export function AuthProvider({ children }) {
     setStatus('loading')
     setError('')
     try {
-      const { user: nextUser } = await loginRequest(credentials)
-      persist({ ...nextUser, email: credentials.email })
+      const { user: nextUser, accessToken, refreshToken } = await loginRequest(credentials)
+      persist({ ...nextUser, name: nextUser.fullName }, { accessToken, refreshToken })
       setStatus('success')
       return { ok: true, errors: {} }
-    } catch {
+    } catch (requestError) {
       setStatus('error')
-      setError('Unable to sign in right now. Try again.')
-      return { ok: false, errors: { form: 'Unable to sign in right now. Try again.' } }
+      setError(requestError.message)
+      return { ok: false, errors: { form: requestError.message } }
     }
   }, [persist])
 
@@ -57,21 +62,15 @@ export function AuthProvider({ children }) {
     setStatus('loading')
     setError('')
     try {
-      const { user: nextUser } = await registerRequest(payload)
-      persist(nextUser)
+      const { user: nextUser, accessToken, refreshToken } = await registerRequest(payload)
+      persist({ ...nextUser, name: nextUser.fullName }, { accessToken, refreshToken })
       setStatus('success')
       return { ok: true, errors: {} }
-    } catch {
+    } catch (requestError) {
       setStatus('error')
-      setError('Unable to create an account right now.')
-      return { ok: false, errors: { form: 'Unable to create an account right now.' } }
+      setError(requestError.message)
+      return { ok: false, errors: { form: requestError.message } }
     }
-  }, [persist])
-
-  const loginDemo = useCallback(async () => {
-    const { user: nextUser } = await loginRequest({ email: 'aarav@finora.dev', password: 'demo-only' })
-    persist(nextUser)
-    return { ok: true }
   }, [persist])
 
   const logout = useCallback(() => {
@@ -79,9 +78,14 @@ export function AuthProvider({ children }) {
     setStatus('idle')
   }, [persist])
 
-  const updateProfile = useCallback((patch) => {
-    persist({ ...user, ...patch })
-  }, [persist, user])
+  const updateProfile = useCallback(async (patch) => {
+    const nextUser = await updateProfileRequest(patch)
+    const tokens = {
+      accessToken: localStorage.getItem(STORAGE_KEYS.accessToken),
+      refreshToken: localStorage.getItem(STORAGE_KEYS.refreshToken),
+    }
+    persist({ ...nextUser, name: nextUser.fullName }, tokens)
+  }, [persist])
 
   const value = useMemo(
     () => ({
@@ -91,11 +95,10 @@ export function AuthProvider({ children }) {
       error,
       login,
       register,
-      loginDemo,
       logout,
       updateProfile,
     }),
-    [user, status, error, login, register, loginDemo, logout, updateProfile],
+    [user, status, error, login, register, logout, updateProfile],
   )
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

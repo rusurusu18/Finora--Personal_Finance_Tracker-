@@ -191,15 +191,7 @@ export const forgotPassword = async (
 
         return res.status(200).json({
             success: true,
-            message: result.message,
-
-            // Development only
-            data: result.resetToken
-                ? {
-                    resetToken:
-                        result.resetToken
-                }
-                : null
+            message: result.message
         });
 
     } catch (error) {

@@ -9,6 +9,7 @@ import budgetRoutes from "../module/budget/budget.routes.js";
 import goalRoutes from "../module/goal/goal.routes.js";
 import dashboardRoutes from "../module/dashboard/dashboard.routes.js";
 import notificationRoutes from "../module/notification/notification.routes.js";
+import paymentRoutes from "../module/payment/payment.routes.js";
 
 const router = express.Router();
 
@@ -21,5 +22,6 @@ router.use("/budgets", budgetRoutes);
 router.use("/goals", goalRoutes);
 router.use("/dashboard", dashboardRoutes);
 router.use("/notifications", notificationRoutes);
+router.use("/payments", paymentRoutes);
 
 export default router;

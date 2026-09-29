@@ -1,30 +1,20 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import Button from '../../components/ui/Button'
 import { useAuth } from '../../contexts/AuthContext'
 
 export default function Profile() {
-  const { user } = useAuth()
+  const { user, updateProfile } = useAuth()
 
-  const [formData, setFormData] = useState({
-    fullName: '',
-    email: '',
-    phone: '',
-  })
+  const [formData, setFormData] = useState(() => ({
+    fullName: user?.fullName || user?.name || '',
+    email: user?.email || '',
+    phone: user?.phone || '',
+  }))
 
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState('')
   const [error, setError] = useState('')
-
-  useEffect(() => {
-    if (user) {
-      setFormData({
-        fullName: user.fullName || '',
-        email: user.email || '',
-        phone: user.phone || '',
-      })
-    }
-  }, [user])
 
   const handleChange = (e) => {
     const { name, value } = e.target
@@ -57,34 +47,12 @@ export default function Profile() {
     try {
       setLoading(true)
 
-      const token = localStorage.getItem('accessToken')
+      await updateProfile({
+        name: formData.fullName,
+        phone: formData.phone,
+      })
 
-      const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/auth/profile`,
-        {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            fullName: formData.fullName,
-            phone: formData.phone,
-          }),
-        }
-      )
-
-      const data = await response.json()
-
-      if (!response.ok) {
-        throw new Error(
-          data.message || 'Failed to update profile.'
-        )
-      }
-
-      setMessage(
-        data.message || 'Profile updated successfully.'
-      )
+      setMessage('Profile updated successfully.')
     } catch (err) {
       setError(
         err.message ||

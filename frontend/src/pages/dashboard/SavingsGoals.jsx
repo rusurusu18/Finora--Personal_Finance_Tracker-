@@ -2,11 +2,13 @@ import { useState } from 'react'
 import { useFinance } from '../../hooks/useFinance'
 import { useToast } from '../../components/ui/Toast'
 import SavingsGoalCard from '../../components/finance/SavingsGoalCard'
-import FinancialInsight from '../../components/finance/FinancialInsight'
 import Button from '../../components/ui/Button'
 import ConfirmDialog from '../../components/ui/ConfirmDialog'
 import Input from '../../components/ui/Input'
 import Modal from '../../components/ui/Modal'
+
+const defaultTargetDate = () =>
+  new Date(Date.UTC(new Date().getUTCFullYear() + 1, 11, 31)).toISOString().slice(0, 10)
 
 export default function SavingsGoals() {
   const { savingsGoals, settings, addGoal, editGoal, removeGoal } = useFinance()
@@ -18,12 +20,12 @@ export default function SavingsGoals() {
     name: '',
     targetAmount: '',
     currentAmount: '',
-    targetDate: '2026-12-31',
+    targetDate: defaultTargetDate(),
   })
 
   function openCreate() {
     setEditing(null)
-    setForm({ name: '', targetAmount: '', currentAmount: '0', targetDate: '2026-12-31' })
+    setForm({ name: '', targetAmount: '', currentAmount: '0', targetDate: defaultTargetDate() })
     setOpen(true)
   }
 
@@ -63,12 +65,6 @@ export default function SavingsGoals() {
         </div>
         <Button onClick={openCreate}>Add goal</Button>
       </div>
-
-      <FinancialInsight
-        tone="info"
-        title="You are on track to reach your Emergency Fund goal."
-        message="Keep the current monthly transfer and the first safety target stays realistic."
-      />
 
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
         {savingsGoals.map((goal) => (
@@ -129,7 +125,7 @@ export default function SavingsGoals() {
       <ConfirmDialog
         open={Boolean(pending)}
         title="Delete savings goal?"
-        description="This goal will be removed from preview data."
+        description="This savings goal will be permanently removed."
         confirmLabel="Delete"
         onClose={() => setPending(null)}
         onConfirm={async () => {

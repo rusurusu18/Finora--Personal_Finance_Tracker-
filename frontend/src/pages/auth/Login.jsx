@@ -6,7 +6,7 @@ import Card from '../../components/ui/Card'
 import Input from '../../components/ui/Input'
 
 export default function Login() {
-  const { login, loginDemo } = useAuth()
+  const { login } = useAuth()
   const navigate = useNavigate()
   const [form, setForm] = useState({ email: '', password: '' })
   const [errors, setErrors] = useState({})
@@ -28,7 +28,6 @@ export default function Login() {
   return (
     <Card className="p-6">
       <h1 className="text-xl font-semibold">Sign in</h1>
-      <p className="mt-1 text-sm text-slate-500">Frontend-only for now. No password is stored.</p>
       <form className="mt-6 space-y-4" onSubmit={handleSubmit} noValidate>
         <Input
           id="email"
@@ -55,16 +54,6 @@ export default function Login() {
           Sign in
         </Button>
       </form>
-      <Button
-        variant="secondary"
-        className="mt-3 w-full"
-        onClick={async () => {
-          await loginDemo()
-          navigate('/dashboard')
-        }}
-      >
-        Explore with demo data
-      </Button>
       <div className="mt-4 flex justify-between text-sm">
         <Link to="/register" className="text-indigo-600">
           Create account

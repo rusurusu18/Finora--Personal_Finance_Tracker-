@@ -12,18 +12,17 @@ export default function Reports() {
   const { push } = useToast()
   const [period, setPeriod] = useState('monthly')
   const currency = settings.currency
+  const now = new Date()
+  const currentMonth = now.toISOString().slice(0, 7)
+  const currentYear = String(now.getFullYear())
 
   const rows = useMemo(() => {
     if (period === 'income') return transactions.filter((item) => item.type === 'income')
     if (period === 'expense') return transactions.filter((item) => item.type === 'expense')
-    if (period === 'yearly') return transactions.filter((item) => item.date.startsWith('2026'))
-    if (period === 'fiscal') {
-      return transactions.filter((item) => item.date >= '2026-07-16' && item.date <= '2027-07-15')
-    }
-    if (period === 'bikram') return transactions.filter((item) => item.date.startsWith('2026-08'))
+    if (period === 'yearly') return transactions.filter((item) => item.date.startsWith(currentYear))
     if (period === 'category') return transactions.filter((item) => item.type === 'expense')
-    return transactions.filter((item) => item.date.startsWith('2026-08'))
-  }, [period, transactions])
+    return transactions.filter((item) => item.date.startsWith(currentMonth))
+  }, [period, transactions, currentMonth, currentYear])
 
   const total = rows.reduce((sum, item) => sum + (item.type === 'income' ? item.amount : -item.amount), 0)
 
@@ -39,7 +38,7 @@ export default function Reports() {
         item.amount,
       ]),
     ])
-    push('CSV downloaded from mock data.', 'success')
+    push('CSV downloaded.', 'success')
   }
 
   return (
@@ -47,9 +46,7 @@ export default function Reports() {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl font-semibold tracking-tight">Reports</h1>
-          <p className="text-sm text-slate-500">
-            Calendar year, fiscal year, and Bikram Sambat are represented with frontend filters only.
-          </p>
+          <p className="text-sm text-slate-500">Reports use your saved transactions.</p>
         </div>
         <div className="flex gap-2">
           <Button variant="secondary" className="no-print" onClick={exportCsv}>

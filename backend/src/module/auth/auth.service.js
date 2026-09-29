@@ -241,60 +241,9 @@ export const getProfile = async (userId) => {
 // FORGOT PASSWORD
 // ==========================================
 
-export const forgotPassword = async (
-    email
-) => {
-
-    const user = await prisma.user.findUnique({
-        where: {
-            email
-        }
-    });
-
-
-    if (!user) {
-        return {
-            message:
-                "If an account exists with this email, a password reset link will be sent."
-        };
-    }
-
-
-    const resetToken = crypto
-        .randomBytes(32)
-        .toString("hex");
-
-
-    const resetTokenHash = crypto
-        .createHash("sha256")
-        .update(resetToken)
-        .digest("hex");
-
-
-    const resetTokenExpiry = new Date(
-        Date.now() + 15 * 60 * 1000
-    );
-
-
-    await prisma.user.update({
-        where: {
-            id: user.id
-        },
-
-        data: {
-            resetToken: resetTokenHash,
-            resetTokenExpiry
-        }
-    });
-
-
+export const forgotPassword = async () => {
     return {
-        message:
-            "If an account exists with this email, a password reset link will be sent.",
-
-        // Development only.
-        // Remove this after email service is implemented.
-        resetToken
+        message: "Password reset delivery is not configured. Please contact support."
     };
 };
 

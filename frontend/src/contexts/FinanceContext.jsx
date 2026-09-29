@@ -1,4 +1,5 @@
 import { createContext, useCallback, useEffect, useMemo, useState } from 'react'
+import { useAuth } from './AuthContext'
 import {
   createAccount,
   createBudget,
@@ -10,11 +11,11 @@ import {
   deleteTransaction,
   getAccounts,
   getBudgets,
+  getCategories,
   getNotifications,
   getSavingsGoals,
   getTransactions,
   markNotificationRead,
-  resetFinanceData,
   updateAccount,
   updateBudget,
   updateSavingsGoal,
@@ -35,7 +36,9 @@ const defaultSettings = {
 }
 
 export function FinanceProvider({ children }) {
+  const { isAuthenticated } = useAuth()
   const [transactions, setTransactions] = useState([])
+  const [categories, setCategories] = useState([])
   const [accounts, setAccounts] = useState([])
   const [budgets, setBudgets] = useState([])
   const [savingsGoals, setSavingsGoals] = useState([])
@@ -50,25 +53,41 @@ export function FinanceProvider({ children }) {
   const [loading, setLoading] = useState(true)
 
   const refresh = useCallback(async () => {
+    if (!isAuthenticated) return
     setLoading(true)
-    const [nextTransactions, nextAccounts, nextBudgets, nextGoals, nextNotifications] = await Promise.all([
-      getTransactions(),
-      getAccounts(),
-      getBudgets(),
-      getSavingsGoals(),
-      getNotifications(),
-    ])
-    setTransactions(nextTransactions)
-    setAccounts(nextAccounts)
-    setBudgets(nextBudgets)
-    setSavingsGoals(nextGoals)
-    setNotifications(nextNotifications)
-    setLoading(false)
-  }, [])
+    try {
+      const [nextTransactions, nextAccounts, nextBudgets, nextGoals, nextNotifications, nextCategories] = await Promise.all([
+        getTransactions(),
+        getAccounts(),
+        getBudgets(),
+        getSavingsGoals(),
+        getNotifications(),
+        getCategories(),
+      ])
+      setTransactions(nextTransactions)
+      setCategories(nextCategories)
+      setAccounts(nextAccounts)
+      setBudgets(nextBudgets)
+      setSavingsGoals(nextGoals)
+      setNotifications(nextNotifications)
+    } finally {
+      setLoading(false)
+    }
+  }, [isAuthenticated])
 
   useEffect(() => {
-    refresh()
-  }, [refresh])
+    if (isAuthenticated) {
+      refresh()
+    } else {
+      setTransactions([])
+      setCategories([])
+      setAccounts([])
+      setBudgets([])
+      setSavingsGoals([])
+      setNotifications([])
+      setLoading(false)
+    }
+  }, [isAuthenticated, refresh])
 
   useEffect(() => {
     localStorage.setItem(STORAGE_KEYS.settings, JSON.stringify(settings))
@@ -139,11 +158,6 @@ export function FinanceProvider({ children }) {
     setNotifications(next)
   }, [])
 
-  const resetData = useCallback(async () => {
-    await resetFinanceData()
-    await refresh()
-  }, [refresh])
-
   const totals = useMemo(() => getAccountTotals(accounts), [accounts])
   const monthStats = useMemo(() => getMonthStats(transactions), [transactions])
   const budgetRemaining = useMemo(() => getBudgetRemaining(budgets), [budgets])
@@ -152,6 +166,7 @@ export function FinanceProvider({ children }) {
     () => ({
       loading,
       transactions,
+      categories,
       accounts,
       budgets,
       savingsGoals,
@@ -174,12 +189,12 @@ export function FinanceProvider({ children }) {
       editGoal,
       removeGoal,
       readNotification,
-      resetData,
       refresh,
     }),
     [
       loading,
       transactions,
+      categories,
       accounts,
       budgets,
       savingsGoals,
@@ -201,7 +216,6 @@ export function FinanceProvider({ children }) {
       editGoal,
       removeGoal,
       readNotification,
-      resetData,
       refresh,
     ],
   )

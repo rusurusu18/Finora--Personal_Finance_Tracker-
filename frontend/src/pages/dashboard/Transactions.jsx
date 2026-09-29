@@ -9,21 +9,23 @@ import ConfirmDialog from '../../components/ui/ConfirmDialog'
 import Input from '../../components/ui/Input'
 import Modal from '../../components/ui/Modal'
 import Select from '../../components/ui/Select'
-import { CATEGORIES, PAYMENT_SOURCES, TRANSACTION_TYPES } from '../../utils/constants'
+import { TRANSACTION_TYPES } from '../../utils/constants'
 import { hasErrors, validateTransaction } from '../../utils/validators'
 
-const emptyForm = {
+const emptyForm = () => ({
   title: '',
   amount: '',
   type: 'expense',
-  category: 'Food',
-  date: '2026-08-20',
-  paymentSource: 'Cash',
+  category: '',
+  date: new Date().toISOString().slice(0, 10),
+  paymentSource: '',
+  accountId: '',
   description: '',
-}
+})
 
 export default function Transactions() {
-  const { transactions, settings, addTransaction, editTransaction, removeTransaction } = useFinance()
+  const { transactions, categories, accounts, settings, addTransaction, editTransaction, removeTransaction } =
+    useFinance()
   const { push } = useToast()
   const [filters, setFilters] = useState({
     search: '',
@@ -68,7 +70,12 @@ export default function Transactions() {
 
   function openCreate() {
     setEditingId(null)
-    setForm(emptyForm)
+    setForm({
+      ...emptyForm(),
+      category: categories.find((item) => item.type === 'expense')?.name || '',
+      accountId: accounts[0]?.id || '',
+      paymentSource: accounts[0]?.name || '',
+    })
     setErrors({})
     setOpen(true)
   }
@@ -82,6 +89,7 @@ export default function Transactions() {
       category: transaction.category,
       date: transaction.date,
       paymentSource: transaction.paymentSource,
+      accountId: transaction.accountId,
       description: transaction.description || '',
     })
     setErrors({})
@@ -90,14 +98,14 @@ export default function Transactions() {
 
   async function handleSave() {
     const nextErrors = validateTransaction(form)
+    if (!form.accountId) nextErrors.accountId = 'Add a money source before creating a transaction.'
     setErrors(nextErrors)
     if (hasErrors(nextErrors)) return
 
     const payload = {
       ...form,
       amount: Number(form.amount),
-      accountId: 1,
-      categoryId: CATEGORIES.find((item) => item.name === form.category)?.id || 3,
+      categoryId: categories.find((item) => item.name === form.category)?.id || null,
     }
 
     if (editingId) {
@@ -115,12 +123,12 @@ export default function Transactions() {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl font-semibold tracking-tight">Transactions</h1>
-          <p className="text-sm text-slate-500">Search, filter, and manage activity. Stored in localStorage for now.</p>
+          <p className="text-sm text-slate-500">Search, filter, and manage your recorded activity.</p>
         </div>
         <Button onClick={openCreate}>Add transaction</Button>
       </div>
 
-      <TransactionFilters filters={filters} onChange={setFilters} />
+      <TransactionFilters filters={filters} categories={categories} onChange={setFilters} />
 
       <TransactionList
         transactions={visible}
@@ -177,21 +185,26 @@ export default function Transactions() {
             value={form.category}
             onChange={(event) => setForm({ ...form, category: event.target.value })}
           >
-            {CATEGORIES.map((item) => (
+            {categories.filter((item) => item.type === form.type).map((item) => (
               <option key={item.id} value={item.name}>
                 {item.name}
               </option>
             ))}
           </Select>
           <Select
-            id="source"
-            label="Payment source"
-            value={form.paymentSource}
-            onChange={(event) => setForm({ ...form, paymentSource: event.target.value })}
+            id="transaction-account"
+            label="Account"
+            value={form.accountId}
+            error={errors.accountId}
+            onChange={(event) => {
+              const account = accounts.find((item) => item.id === event.target.value)
+              setForm({ ...form, accountId: event.target.value, paymentSource: account?.name || '' })
+            }}
           >
-            {PAYMENT_SOURCES.map((item) => (
-              <option key={item} value={item}>
-                {item}
+            <option value="">Select an account</option>
+            {accounts.map((account) => (
+              <option key={account.id} value={account.id}>
+                {account.name}
               </option>
             ))}
           </Select>
@@ -215,7 +228,7 @@ export default function Transactions() {
       <ConfirmDialog
         open={Boolean(pendingDelete)}
         title="Delete transaction?"
-        description="This removes the record from local preview data."
+        description="This permanently removes the transaction from your account."
         confirmLabel="Delete"
         onClose={() => setPendingDelete(null)}
         onConfirm={async () => {

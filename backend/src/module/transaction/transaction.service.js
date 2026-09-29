@@ -171,6 +171,7 @@ export const createTransaction = async (userId, data) => {
                 type       : data.type,
                 amount     : data.amount,
                 description: data.description,
+                paymentSource: data.paymentSource ?? null,
                 notes      : data.notes ?? null,
                 date       : data.date
             },
@@ -198,6 +199,23 @@ export const updateTransaction = async (userId, transactionId, data) => {
 
     if (!existing) throw ApiError.notFound("Transaction not found");
 
+    if (data.accountId) {
+        const account = await prisma.account.findFirst({
+            where: { id: data.accountId, userId }
+        });
+        if (!account) throw ApiError.notFound("Account not found");
+    }
+
+    if (data.categoryId) {
+        const category = await prisma.category.findFirst({
+            where: {
+                id: data.categoryId,
+                OR: [{ userId }, { isDefault: true }]
+            }
+        });
+        if (!category) throw ApiError.notFound("Category not found");
+    }
+
     const updated = await prisma.$transaction(async (tx) => {
 
         // Reverse old balance effect
@@ -207,9 +225,12 @@ export const updateTransaction = async (userId, transactionId, data) => {
         const newData = await tx.transaction.update({
             where  : { id: transactionId },
             data   : {
+                accountId  : data.accountId ?? existing.accountId,
+                type       : data.type      ?? existing.type,
                 categoryId : data.categoryId  ?? existing.categoryId,
                 amount     : data.amount      ?? existing.amount,
                 description: data.description ?? existing.description,
+                paymentSource: data.paymentSource !== undefined ? data.paymentSource : existing.paymentSource,
                 notes      : data.notes       !== undefined ? data.notes : existing.notes,
                 date       : data.date        ?? existing.date
             },

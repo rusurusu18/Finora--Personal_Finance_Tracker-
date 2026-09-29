@@ -10,6 +10,7 @@ import Contact from '../pages/Contact'
 import Features from '../pages/Features'
 import Home from '../pages/Home'
 import Pricing from '../pages/Pricing'
+import EsewaPaymentResult from '../pages/EsewaPaymentResult'
 import NotFound from '../pages/NotFound'
 
 import ForgotPassword from '../pages/auth/ForgotPassword'
@@ -82,6 +83,9 @@ export default function AppRouter() {
           path="/pricing"
           element={<Pricing />}
         />
+
+        <Route path="/pricing/esewa/success" element={<EsewaPaymentResult />} />
+        <Route path="/pricing/esewa/failure" element={<EsewaPaymentResult />} />
 
       </Route>
 

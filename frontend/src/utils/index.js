@@ -1,4 +1,4 @@
-export { APP_NAME, CATEGORIES, CURRENCIES, PAYMENT_SOURCES, STORAGE_KEYS } from './constants'
+export { APP_NAME, CURRENCIES, PAYMENT_SOURCES, STORAGE_KEYS } from './constants'
 export {
   clampPercent,
   cn,

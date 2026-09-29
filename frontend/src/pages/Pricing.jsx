@@ -1,29 +1,53 @@
+import { useEffect, useState } from 'react'
 import Card from '../components/ui/Card'
 import Button from '../components/ui/Button'
 import { useNavigate } from 'react-router-dom'
+import { useAuth } from '../contexts/AuthContext'
+import { getEsewaPlusPlan, initiateEsewaPayment } from '../config/services'
 import { FiUser, FiHome, FiArrowRight } from 'react-icons/fi'
-
-const plans = [
-  {
-    name: 'Personal',
-    price: 'Free during preview',
-    icon: FiUser,
-    iconColor: 'text-blue-600',
-    iconBg: 'bg-blue-100 dark:bg-blue-950',
-    points: ['Mock dashboard', 'NPR-first sources', 'Budgets and goals'],
-  },
-  {
-    name: 'Plus',
-    price: 'Coming later',
-    icon: FiHome,
-    iconColor: 'text-violet-600',
-    iconBg: 'bg-violet-100 dark:bg-violet-950',
-    points: ['Shared household view', 'Export history', 'Priority support'],
-  },
-]
 
 export default function Pricing() {
   const navigate = useNavigate()
+  const { isAuthenticated } = useAuth()
+  const [plan, setPlan] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [busy, setBusy] = useState(false)
+  const [error, setError] = useState('')
+
+  useEffect(() => {
+    getEsewaPlusPlan()
+      .then(setPlan)
+      .catch((requestError) => setError(requestError.message))
+      .finally(() => setLoading(false))
+  }, [])
+
+  async function subscribe() {
+    if (!isAuthenticated) {
+      navigate('/login')
+      return
+    }
+
+    setBusy(true)
+    setError('')
+    try {
+      const checkout = await initiateEsewaPayment()
+      const form = document.createElement('form')
+      form.method = 'POST'
+      form.action = checkout.paymentUrl
+      Object.entries(checkout.fields).forEach(([name, value]) => {
+        const input = document.createElement('input')
+        input.type = 'hidden'
+        input.name = name
+        input.value = value
+        form.appendChild(input)
+      })
+      document.body.appendChild(form)
+      form.submit()
+    } catch (requestError) {
+      setError(requestError.message)
+      setBusy(false)
+    }
+  }
 
   return (
     <main className="mx-auto max-w-5xl px-4 py-16">
@@ -34,12 +58,31 @@ export default function Pricing() {
       </div>
 
       <div className="mt-10 grid gap-6 md:grid-cols-2">
-        {plans.map((plan) => {
-          const Icon = plan.icon
+        {[
+          {
+            name: 'Personal',
+            price: 'Free',
+            icon: FiUser,
+            iconColor: 'text-blue-600',
+            iconBg: 'bg-blue-100 dark:bg-blue-950',
+            points: ['Personal finance tracking', 'Accounts, budgets, and goals', 'Reports and analytics'],
+          },
+          {
+            name: 'Plus',
+            price: plan?.enabled
+              ? `NPR ${plan.amount} for ${plan.durationDays} days · one-time payment`
+              : 'Unavailable',
+            icon: FiHome,
+            iconColor: 'text-emerald-700',
+            iconBg: 'bg-emerald-100 dark:bg-emerald-950',
+            points: ['All Personal features', 'Time-limited Plus access', 'eSewa-verified checkout'],
+          },
+        ].map((item) => {
+          const Icon = item.icon
 
           return (
             <Card
-              key={plan.name}
+              key={item.name}
               className="group relative overflow-hidden p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
             >
               {/* Decorative background */}
@@ -48,30 +91,24 @@ export default function Pricing() {
               <div className="relative">
                 {/* Icon */}
                 <div
-                  className={`flex h-12 w-12 items-center justify-center rounded-xl ${plan.iconBg}`}
+                  className={`flex h-12 w-12 items-center justify-center rounded-xl ${item.iconBg}`}
                 >
-                  <Icon className={`h-6 w-6 ${plan.iconColor}`} />
+                  <Icon className={`h-6 w-6 ${item.iconColor}`} />
                 </div>
 
                 {/* Plan name */}
                 <div className="mt-5 flex items-center justify-between">
-                  <h2 className="text-xl font-semibold">{plan.name}</h2>
-
-                  {plan.name === 'Personal' && (
-                    <span className="rounded-full bg-blue-50 px-3 py-1 text-xs font-medium text-blue-600 dark:bg-blue-950 dark:text-blue-300">
-                      Preview
-                    </span>
-                  )}
+                  <h2 className="text-xl font-semibold">{item.name}</h2>
                 </div>
 
                 {/* Price */}
                 <p className="mt-2 text-sm font-medium text-slate-500 dark:text-slate-400">
-                  {plan.price}
+                  {item.price}
                 </p>
 
                 {/* Features */}
                 <ul className="mt-6 space-y-3">
-                  {plan.points.map((point) => (
+                  {item.points.map((point) => (
                     <li
                       key={point}
                       className="flex items-center gap-3 text-sm text-slate-600 dark:text-slate-300"
@@ -87,9 +124,16 @@ export default function Pricing() {
                 {/* Button */}
                 <Button
                   className="mt-7 w-full justify-center"
-                  onClick={() => navigate('/register')}
+                  disabled={item.name === 'Plus' ? loading || !plan?.enabled || busy : false}
+                  onClick={item.name === 'Plus' ? subscribe : () => navigate('/register')}
                 >
-                  Get Started
+                  {item.name === 'Plus'
+                    ? busy
+                      ? 'Opening eSewa...'
+                      : isAuthenticated
+                        ? 'Subscribe with eSewa'
+                        : 'Sign in to subscribe'
+                    : 'Create account'}
                   <FiArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
                 </Button>
               </div>
@@ -97,6 +141,10 @@ export default function Pricing() {
           )
         })}
       </div>
+      {error ? <p className="mt-4 text-center text-sm text-red-600" role="alert">{error}</p> : null}
+      {!loading && !plan?.enabled && !error ? (
+        <p className="mt-4 text-center text-sm text-slate-500">Plus checkout is not configured yet.</p>
+      ) : null}
     </main>
   )
 }

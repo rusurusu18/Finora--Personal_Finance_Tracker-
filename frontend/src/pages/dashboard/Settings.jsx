@@ -3,25 +3,25 @@ import { useAuth } from '../../contexts/AuthContext'
 import { useTheme } from '../../contexts/ThemeContext'
 import { useFinance } from '../../hooks/useFinance'
 import { useToast } from '../../components/ui/Toast'
+import { changePasswordRequest } from '../../config/services'
 import Button from '../../components/ui/Button'
 import Card from '../../components/ui/Card'
 import Input from '../../components/ui/Input'
 import Select from '../../components/ui/Select'
-import ConfirmDialog from '../../components/ui/ConfirmDialog'
 import { CURRENCIES } from '../../utils/constants'
 
 export default function Settings() {
   const { user, updateProfile } = useAuth()
   const { theme, setTheme } = useTheme()
-  const { settings, setSettings, resetData } = useFinance()
+  const { settings, setSettings } = useFinance()
   const { push } = useToast()
   const [profile, setProfile] = useState({
     name: user?.name || '',
     email: user?.email || '',
   })
-  const [resetOpen, setResetOpen] = useState(false)
   const [currentPassword, setCurrentPassword] = useState('')
   const [newPassword, setNewPassword] = useState('')
+  const [passwordError, setPasswordError] = useState('')
 
   return (
     <div className="space-y-6">
@@ -44,14 +44,18 @@ export default function Settings() {
             label="Email"
             type="email"
             value={profile.email}
-            onChange={(event) => setProfile({ ...profile, email: event.target.value })}
+            readOnly
           />
         </div>
         <Button
           className="mt-4"
-          onClick={() => {
-            updateProfile(profile)
-            push('Profile updated on this device.', 'success')
+          onClick={async () => {
+            try {
+              await updateProfile(profile)
+              push('Profile updated.', 'success')
+            } catch (error) {
+              push(error.message, 'error')
+            }
           }}
         >
           Save profile
@@ -115,7 +119,7 @@ export default function Settings() {
       <Card className="p-5">
         <h2 className="font-semibold">Security</h2>
         <p className="mt-1 text-sm text-slate-500">
-          Password fields are UI only. Values are not stored and no token is created.
+          Change your password using your current credentials.
         </p>
         <div className="mt-4 grid gap-3 md:grid-cols-2">
           <Input
@@ -138,36 +142,23 @@ export default function Settings() {
         <Button
           className="mt-4"
           variant="secondary"
-          onClick={() => {
-            setCurrentPassword('')
-            setNewPassword('')
-            push('Password change is not available until the API exists.', 'info')
+          onClick={async () => {
+            setPasswordError('')
+            try {
+              await changePasswordRequest({ currentPassword, newPassword })
+              setCurrentPassword('')
+              setNewPassword('')
+              push('Password updated.', 'success')
+            } catch (error) {
+              setPasswordError(error.message)
+            }
           }}
         >
           Update password
         </Button>
+        {passwordError ? <p className="mt-3 text-sm text-red-600">{passwordError}</p> : null}
       </Card>
 
-      <Card className="p-5">
-        <h2 className="font-semibold">Data management</h2>
-        <p className="mt-1 text-sm text-slate-500">Reset restores the original Nepal-oriented mock data.</p>
-        <Button className="mt-4" variant="danger" onClick={() => setResetOpen(true)}>
-          Reset mock data
-        </Button>
-      </Card>
-
-      <ConfirmDialog
-        open={resetOpen}
-        title="Reset all preview data?"
-        description="Transactions, accounts, budgets, and goals will return to the seed set."
-        confirmLabel="Reset"
-        onClose={() => setResetOpen(false)}
-        onConfirm={async () => {
-          await resetData()
-          setResetOpen(false)
-          push('Mock data restored.', 'success')
-        }}
-      />
     </div>
   )
 }

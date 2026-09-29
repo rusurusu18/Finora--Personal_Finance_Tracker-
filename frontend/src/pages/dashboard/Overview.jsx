@@ -3,7 +3,6 @@ import { useAuth } from '../../contexts/AuthContext'
 import MoneySourceCard from '../../components/finance/MoneySourceCard'
 import BudgetCard from '../../components/finance/BudgetCard'
 import SavingsGoalCard from '../../components/finance/SavingsGoalCard'
-import FinancialInsight from '../../components/finance/FinancialInsight'
 import TransactionList from '../../components/finance/TransactionList'
 import FinancialSummary from '../../components/sections/FinancialSummary'
 import StatCard from '../../components/sections/StatCard'
@@ -13,7 +12,6 @@ import SectionCard from '../../components/sections/SectionCard'
 import Skeleton from '../../components/ui/Skeleton'
 import { getCategorySpending, getMonthlyTrend } from '../../utils/dashboardData'
 import { getGreeting } from '../../utils/helpers'
-import { seedInsights } from '../../utils/dummyData'
 
 export default function Overview() {
   const { user } = useAuth()
@@ -21,7 +19,7 @@ export default function Overview() {
     useFinance()
   const currency = settings.currency
   const trend = getMonthlyTrend(transactions)
-  const categories = getCategorySpending(transactions.filter((item) => item.date.startsWith('2026-08')))
+  const categories = getCategorySpending(transactions)
 
   if (loading) {
     return (
@@ -44,7 +42,7 @@ export default function Overview() {
         </p>
       </div>
 
-      <FinancialSummary total={totals.total} change={0.124} currency={currency} />
+      <FinancialSummary total={totals.total} currency={currency} />
 
       <div className="grid gap-4 md:grid-cols-3">
         <MoneySourceCard label="Bank" amount={totals.bank} currency={currency} />
@@ -60,16 +58,10 @@ export default function Overview() {
       </div>
 
       <div className="grid gap-4 xl:grid-cols-2">
-        <SectionCard title="Income vs expense" description="Monthly trend from mock activity.">
+        <SectionCard title="Income vs expense" description="Monthly totals from your recorded transactions.">
           <AreaChart data={trend} currency={currency} />
         </SectionCard>
         <SpendingOverview data={categories} currency={currency} />
-      </div>
-
-      <div className="grid gap-4 lg:grid-cols-3">
-        {seedInsights.map((insight) => (
-          <FinancialInsight key={insight.id} {...insight} />
-        ))}
       </div>
 
       <div className="grid gap-4 lg:grid-cols-2">

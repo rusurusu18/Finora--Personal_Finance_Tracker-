@@ -121,7 +121,7 @@ export default function Accounts() {
       <ConfirmDialog
         open={Boolean(pending)}
         title="Delete money source?"
-        description="This source will be removed from the preview data."
+        description="This source and its associated transactions will be permanently removed."
         confirmLabel="Delete"
         onClose={() => setPending(null)}
         onConfirm={async () => {

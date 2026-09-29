@@ -3,7 +3,6 @@ import AreaChart from '../../components/sections/AreaChart'
 import BarChart from '../../components/sections/BarChart'
 import DonutChart from '../../components/sections/DonutChart'
 import SectionCard from '../../components/sections/SectionCard'
-import FinancialInsight from '../../components/finance/FinancialInsight'
 import { getCategorySpending, getMonthlyTrend, getSourceSpending } from '../../utils/dashboardData'
 
 export default function Analytics() {
@@ -18,7 +17,7 @@ export default function Analytics() {
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-semibold tracking-tight">Analytics</h1>
-        <p className="text-sm text-slate-500">Charts update when mock transactions change.</p>
+        <p className="text-sm text-slate-500">Charts summarize your recorded financial activity.</p>
       </div>
 
       <div className="grid gap-4 lg:grid-cols-2">
@@ -36,18 +35,6 @@ export default function Analytics() {
         </SectionCard>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2">
-        <FinancialInsight
-          tone="warning"
-          title="Food spending increased by 18%."
-          message="August food spend is higher than July on the current mock set."
-        />
-        <FinancialInsight
-          tone="success"
-          title="Your savings rate improved by 8%."
-          message="Income still covers core bills with room left for goals."
-        />
-      </div>
     </div>
   )
 }

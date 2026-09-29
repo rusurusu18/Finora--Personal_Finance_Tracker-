@@ -1,8 +1,8 @@
 import Input from '../ui/Input'
 import Select from '../ui/Select'
-import { CATEGORIES, PAYMENT_SOURCES, TRANSACTION_TYPES } from '../../utils/constants'
+import { TRANSACTION_TYPES } from '../../utils/constants'
 
-export default function TransactionFilters({ filters, onChange }) {
+export default function TransactionFilters({ filters, onChange, categories }) {
   function update(key, value) {
     onChange({ ...filters, [key]: value })
   }
@@ -31,22 +31,9 @@ export default function TransactionFilters({ filters, onChange }) {
         onChange={(event) => update('category', event.target.value)}
       >
         <option value="">All categories</option>
-        {CATEGORIES.map((item) => (
+        {categories.map((item) => (
           <option key={item.id} value={item.name}>
             {item.name}
-          </option>
-        ))}
-      </Select>
-      <Select
-        id="source"
-        label="Payment source"
-        value={filters.paymentSource}
-        onChange={(event) => update('paymentSource', event.target.value)}
-      >
-        <option value="">All sources</option>
-        {PAYMENT_SOURCES.map((item) => (
-          <option key={item} value={item}>
-            {item}
           </option>
         ))}
       </Select>

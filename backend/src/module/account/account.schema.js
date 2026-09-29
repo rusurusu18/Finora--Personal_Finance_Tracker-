@@ -23,6 +23,7 @@ export const createAccountSchema = z.object({
         .toUpperCase()
         .default("NPR"),
 
+    institution: z.string().max(100).optional().nullable(),
     icon : z.string().optional(),
     color: z.string().optional()
 });
@@ -40,6 +41,9 @@ export const updateAccountSchema = z.object({
         .max(100)
         .optional(),
 
+    type: z.enum(["BANK", "WALLET", "CASH"]).optional(),
+    balance: z.number().min(0).optional(),
+    institution: z.string().max(100).optional().nullable(),
     icon : z.string().optional().nullable(),
     color: z.string().optional().nullable()
 });

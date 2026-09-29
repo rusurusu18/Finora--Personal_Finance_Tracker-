@@ -34,6 +34,8 @@ export const createTransactionSchema = z.object({
         .min(1, "Description is required")
         .max(255, "Description must not exceed 255 characters"),
 
+    paymentSource: z.string().max(100).optional().nullable(),
+
     notes: z
         .string()
         .max(1000, "Notes must not exceed 1000 characters")
@@ -63,6 +65,10 @@ export const createTransactionSchema = z.object({
 
 export const updateTransactionSchema = z.object({
 
+    accountId: z.string().min(1).optional(),
+
+    type: z.enum(["INCOME", "EXPENSE"]).optional(),
+
     categoryId: z
         .string()
         .optional()
@@ -78,6 +84,8 @@ export const updateTransactionSchema = z.object({
         .min(1)
         .max(255)
         .optional(),
+
+    paymentSource: z.string().max(100).optional().nullable(),
 
     notes: z
         .string()

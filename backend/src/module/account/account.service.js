@@ -66,6 +66,7 @@ export const createAccount = async (userId, data) => {
             type    : data.type,
             balance : data.balance  ?? 0,
             currency: data.currency ?? "NPR",
+            institution: data.institution ?? null,
             icon    : data.icon,
             color   : data.color
         }
