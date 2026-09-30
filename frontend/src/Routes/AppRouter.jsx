@@ -28,6 +28,7 @@ import SavingsGoals from '../pages/dashboard/SavingsGoals'
 import Settings from '../pages/dashboard/Settings'
 import Transactions from '../pages/dashboard/Transactions'
 import Profile from '../pages/dashboard/Profile'
+import Translator from '../pages/dashboard/Translator'
 
 
 // ==========================================
@@ -190,6 +191,11 @@ export default function AppRouter() {
         <Route
           path="settings"
           element={<Settings />}
+        />
+
+        <Route
+          path="translator"
+          element={<Translator />}
         />
 
       </Route>

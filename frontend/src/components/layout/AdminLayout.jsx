@@ -1,12 +1,15 @@
 import { useState } from 'react'
 import { NavLink, Outlet } from 'react-router-dom'
 import MobileNavigation from './MobileNavigation'
-import Sidebar, { dashboardLinks } from './Sidebar'
+import Sidebar from './Sidebar'
+import { dashboardLinks } from './dashboardLinks'
 import Topbar from './Topbar'
 import { cn } from '../../utils/helpers'
+import { useLanguage } from '../../contexts/useLanguage'
 
 export default function AdminLayout() {
   const [drawerOpen, setDrawerOpen] = useState(false)
+  const { t } = useLanguage()
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100">
@@ -47,7 +50,7 @@ export default function AdminLayout() {
                     )
                   }
                 >
-                  {label}
+                  {t(label)}
                 </NavLink>
               ))}
             </nav>

@@ -11,6 +11,7 @@ export const STORAGE_KEYS = {
   accessToken: 'finora_access_token',
   refreshToken: 'finora_refresh_token',
   theme: 'finora_theme',
+  language: 'finora_language',
   settings: 'finora_settings',
 }
 

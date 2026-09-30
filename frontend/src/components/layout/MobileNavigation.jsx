@@ -1,6 +1,7 @@
 import { NavLink } from 'react-router-dom'
 import { ChartColumn, LayoutDashboard, Receipt, Target, Wallet } from 'lucide-react'
 import { cn } from '../../utils/helpers'
+import { useLanguage } from '../../contexts/useLanguage'
 
 const items = [
   { to: '/dashboard', label: 'Home', icon: LayoutDashboard, end: true },
@@ -11,6 +12,7 @@ const items = [
 ]
 
 export default function MobileNavigation() {
+  const { t } = useLanguage()
   return (
     <nav
       className="fixed inset-x-0 bottom-0 z-40 border-t border-slate-200 bg-white px-2 py-2 md:hidden dark:border-slate-800 dark:bg-slate-950"
@@ -32,7 +34,7 @@ export default function MobileNavigation() {
               }
             >
               <Icon className="h-5 w-5" aria-hidden="true" />
-              {label}
+              {t(label)}
             </NavLink>
           </li>
         ))}

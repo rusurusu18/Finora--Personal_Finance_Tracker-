@@ -1,4 +1,5 @@
 import Card from '../ui/Card'
+import { useLanguage } from '../../contexts/useLanguage'
 
 const features = [
   {
@@ -28,17 +29,18 @@ const features = [
 ]
 
 export default function FeaturesSection() {
+  const { t } = useLanguage()
   return (
     <section id="features" className="mx-auto max-w-6xl px-4 py-16">
-      <h2 className="text-2xl font-semibold tracking-tight">What Finora helps you do</h2>
+      <h2 className="text-2xl font-semibold tracking-tight">{t('What Finora helps you do')}</h2>
       <p className="mt-2 max-w-2xl text-slate-600 dark:text-slate-300">
-        The product is built around a clear picture of money, not a crowded ledger.
+        {t('The product is built around a clear picture of money, not a crowded ledger.')}
       </p>
       <div className="mt-8 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {features.map((feature) => (
           <Card key={feature.title} className="p-5">
-            <h3 className="font-semibold">{feature.title}</h3>
-            <p className="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-300">{feature.body}</p>
+            <h3 className="font-semibold">{t(feature.title)}</h3>
+            <p className="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-300">{t(feature.body)}</p>
           </Card>
         ))}
       </div>

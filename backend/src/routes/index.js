@@ -10,6 +10,7 @@ import goalRoutes from "../module/goal/goal.routes.js";
 import dashboardRoutes from "../module/dashboard/dashboard.routes.js";
 import notificationRoutes from "../module/notification/notification.routes.js";
 import paymentRoutes from "../module/payment/payment.routes.js";
+import translationRoutes from "../module/translation/translation.routes.js";
 
 const router = express.Router();
 
@@ -23,5 +24,6 @@ router.use("/goals", goalRoutes);
 router.use("/dashboard", dashboardRoutes);
 router.use("/notifications", notificationRoutes);
 router.use("/payments", paymentRoutes);
+router.use("/translations", translationRoutes);
 
 export default router;

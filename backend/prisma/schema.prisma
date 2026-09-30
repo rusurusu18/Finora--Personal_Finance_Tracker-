@@ -86,6 +86,7 @@ model User {
   budgets       Budget[]
   savingsGoals  SavingsGoal[]
   notifications Notification[]
+  translations  Translation[]
   payments      SubscriptionPayment[]
   subscriptionTier String   @default("FREE")
   subscriptionExpiresAt DateTime?
@@ -227,6 +228,20 @@ model Notification {
   createdAt DateTime @default(now())
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Translation {
+  id               String   @id @default(cuid())
+  userId           String
+  sourceText       String   @db.Text
+  translatedText   String   @db.Text
+  sourceLanguage   String   @default("en")
+  targetLanguage   String   @default("ne")
+  createdAt        DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
 }
 
 model SubscriptionPayment {
