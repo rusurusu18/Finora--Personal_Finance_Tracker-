@@ -15,6 +15,16 @@ function readUser() {
   }
 }
 
+function getFormErrors(requestError) {
+  const fieldNames = { fullName: 'name' }
+  const errors = Object.fromEntries(
+    (requestError.validationErrors || [])
+      .filter((issue) => issue.field)
+      .map((issue) => [fieldNames[issue.field] || issue.field, issue.message]),
+  )
+  return Object.keys(errors).length ? errors : { form: requestError.message }
+}
+
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(readUser)
   const [status, setStatus] = useState('idle')
@@ -49,7 +59,7 @@ export function AuthProvider({ children }) {
     } catch (requestError) {
       setStatus('error')
       setError(requestError.message)
-      return { ok: false, errors: { form: requestError.message } }
+      return { ok: false, errors: getFormErrors(requestError) }
     }
   }, [persist])
 
@@ -69,7 +79,7 @@ export function AuthProvider({ children }) {
     } catch (requestError) {
       setStatus('error')
       setError(requestError.message)
-      return { ok: false, errors: { form: requestError.message } }
+      return { ok: false, errors: getFormErrors(requestError) }
     }
   }, [persist])
 

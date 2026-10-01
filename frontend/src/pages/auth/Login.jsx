@@ -4,9 +4,13 @@ import { useAuth } from '../../contexts/AuthContext'
 import Button from '../../components/ui/Button'
 import Card from '../../components/ui/Card'
 import Input from '../../components/ui/Input'
+import PasswordInput from '../../components/ui/PasswordInput'
+import { FiLogIn } from 'react-icons/fi'
+import { useLanguage } from '../../contexts/useLanguage'
 
 export default function Login() {
   const { login } = useAuth()
+  const { t } = useLanguage()
   const navigate = useNavigate()
   const [form, setForm] = useState({ email: '', password: '' })
   const [errors, setErrors] = useState({})
@@ -27,39 +31,41 @@ export default function Login() {
 
   return (
     <Card className="p-6">
-      <h1 className="text-xl font-semibold">Sign in</h1>
+      <h1 className="flex items-center gap-2 text-xl font-semibold">
+        <FiLogIn className="h-5 w-5 text-slate-500" aria-hidden="true" />
+        {t('Sign in')}
+      </h1>
       <form className="mt-6 space-y-4" onSubmit={handleSubmit} noValidate>
         <Input
           id="email"
           name="email"
           type="email"
-          label="Email"
+          label={t('Email')}
           value={form.email}
-          error={errors.email}
+          error={errors.email ? t(errors.email) : ''}
           onChange={update}
           autoComplete="email"
         />
-        <Input
+        <PasswordInput
           id="password"
           name="password"
-          type="password"
-          label="Password"
+          label={t('Password')}
           value={form.password}
-          error={errors.password}
+          error={errors.password ? t(errors.password) : ''}
           onChange={update}
           autoComplete="current-password"
         />
-        {errors.form ? <p className="text-sm text-red-600">{errors.form}</p> : null}
+        {errors.form ? <p className="text-sm text-red-600">{t(errors.form)}</p> : null}
         <Button type="submit" className="w-full">
-          Sign in
+          {t('Sign in')}
         </Button>
       </form>
       <div className="mt-4 flex justify-between text-sm">
         <Link to="/register" className="text-indigo-600">
-          Create account
+          {t('Create account')}
         </Link>
         <Link to="/forgot-password" className="text-slate-500">
-          Forgot password
+          {t('Forgot password')}
         </Link>
       </div>
     </Card>

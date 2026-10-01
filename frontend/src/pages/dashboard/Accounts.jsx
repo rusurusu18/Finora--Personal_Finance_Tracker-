@@ -8,8 +8,11 @@ import Input from '../../components/ui/Input'
 import Modal from '../../components/ui/Modal'
 import Select from '../../components/ui/Select'
 import { ACCOUNT_TYPES } from '../../utils/constants'
+import { FiPlus } from 'react-icons/fi'
+import { useLanguage } from '../../contexts/useLanguage'
 
 export default function Accounts() {
+  const { t } = useLanguage()
   const { accounts, settings, addAccount, editAccount, removeAccount } = useFinance()
   const { push } = useToast()
   const [open, setOpen] = useState(false)
@@ -44,10 +47,10 @@ export default function Accounts() {
     }
     if (editing) {
       await editAccount(editing.id, payload)
-      push('Account updated.', 'success')
+      push(t('Account updated.'), 'success')
     } else {
       await addAccount(payload)
-      push('Account added.', 'success')
+      push(t('Account added.'), 'success')
     }
     setOpen(false)
   }
@@ -56,10 +59,10 @@ export default function Accounts() {
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Accounts</h1>
-          <p className="text-sm text-slate-500">Bank accounts, cash, and digital wallets.</p>
+          <h1 className="text-2xl font-semibold tracking-tight">{t('Accounts')}</h1>
+          <p className="text-sm text-slate-500">{t('Bank accounts, cash, and digital wallets.')}</p>
         </div>
-        <Button onClick={openCreate}>Add source</Button>
+        <Button onClick={openCreate}><FiPlus aria-hidden="true" />{t('Add source')}</Button>
       </div>
 
       <AccountList
@@ -72,45 +75,45 @@ export default function Accounts() {
 
       <Modal
         open={open}
-        title={editing ? 'Edit money source' : 'Add money source'}
+        title={t(editing ? 'Edit money source' : 'Add money source')}
         onClose={() => setOpen(false)}
         footer={
           <>
             <Button variant="secondary" onClick={() => setOpen(false)}>
-              Cancel
+              {t('Cancel')}
             </Button>
-            <Button onClick={save}>Save</Button>
+            <Button onClick={save}>{t('Save')}</Button>
           </>
         }
       >
         <div className="grid gap-3">
           <Input
             id="account-name"
-            label="Name"
+            label={t('Name')}
             value={form.name}
             onChange={(event) => setForm({ ...form, name: event.target.value })}
           />
           <Select
             id="account-type"
-            label="Type"
+            label={t('Type')}
             value={form.type}
             onChange={(event) => setForm({ ...form, type: event.target.value })}
           >
             {ACCOUNT_TYPES.map((item) => (
               <option key={item.value} value={item.value}>
-                {item.label}
+                {t(item.label)}
               </option>
             ))}
           </Select>
           <Input
             id="account-institution"
-            label={form.type === 'bank' ? 'Bank' : 'Provider'}
+            label={t(form.type === 'bank' ? 'Bank' : 'Provider')}
             value={form.institution}
             onChange={(event) => setForm({ ...form, institution: event.target.value })}
           />
           <Input
             id="account-balance"
-            label="Balance"
+            label={t('Balance')}
             type="number"
             value={form.balance}
             onChange={(event) => setForm({ ...form, balance: event.target.value })}
@@ -120,14 +123,14 @@ export default function Accounts() {
 
       <ConfirmDialog
         open={Boolean(pending)}
-        title="Delete money source?"
-        description="This source and its associated transactions will be permanently removed."
-        confirmLabel="Delete"
+        title={t('Delete money source?')}
+        description={t('This source and its associated transactions will be permanently removed.')}
+        confirmLabel={t('Delete')}
         onClose={() => setPending(null)}
         onConfirm={async () => {
           await removeAccount(pending.id)
           setPending(null)
-          push('Account deleted.', 'success')
+          push(t('Account deleted.'), 'success')
         }}
       />
     </div>

@@ -1,5 +1,6 @@
 import Button from '../ui/Button'
 import { useLanguage } from '../../contexts/useLanguage'
+import { FiArrowRight } from 'react-icons/fi'
 
 export default function CtaSection({ onGetStarted }) {
   const { t } = useLanguage()
@@ -11,6 +12,7 @@ export default function CtaSection({ onGetStarted }) {
           {t('Create an account to organize your money, track spending, and build a plan around your goals.')}
         </p>
         <Button className="mt-6" onClick={onGetStarted}>
+          <FiArrowRight aria-hidden="true" />
           {t('Get Started')}
         </Button>
       </div>

@@ -6,11 +6,14 @@ import Button from '../../components/ui/Button'
 import ConfirmDialog from '../../components/ui/ConfirmDialog'
 import Input from '../../components/ui/Input'
 import Modal from '../../components/ui/Modal'
+import { FiPlus } from 'react-icons/fi'
+import { useLanguage } from '../../contexts/useLanguage'
 
 const defaultTargetDate = () =>
   new Date(Date.UTC(new Date().getUTCFullYear() + 1, 11, 31)).toISOString().slice(0, 10)
 
 export default function SavingsGoals() {
+  const { t } = useLanguage()
   const { savingsGoals, settings, addGoal, editGoal, removeGoal } = useFinance()
   const { push } = useToast()
   const [open, setOpen] = useState(false)
@@ -48,10 +51,10 @@ export default function SavingsGoals() {
     }
     if (editing) {
       await editGoal(editing.id, payload)
-      push('Goal updated.', 'success')
+      push(t('Goal updated.'), 'success')
     } else {
       await addGoal(payload)
-      push('Goal added.', 'success')
+      push(t('Goal added.'), 'success')
     }
     setOpen(false)
   }
@@ -60,10 +63,10 @@ export default function SavingsGoals() {
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Savings goals</h1>
-          <p className="text-sm text-slate-500">Emergency fund, laptop, travel, education, and more.</p>
+          <h1 className="text-2xl font-semibold tracking-tight">{t('Savings goals')}</h1>
+          <p className="text-sm text-slate-500">{t('Emergency fund, laptop, travel, education, and more.')}</p>
         </div>
-        <Button onClick={openCreate}>Add goal</Button>
+        <Button onClick={openCreate}><FiPlus aria-hidden="true" />{t('Add goal')}</Button>
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
@@ -80,41 +83,41 @@ export default function SavingsGoals() {
 
       <Modal
         open={open}
-        title={editing ? 'Edit goal' : 'Add goal'}
+        title={t(editing ? 'Edit goal' : 'Add goal')}
         onClose={() => setOpen(false)}
         footer={
           <>
             <Button variant="secondary" onClick={() => setOpen(false)}>
-              Cancel
+              {t('Cancel')}
             </Button>
-            <Button onClick={save}>Save</Button>
+            <Button onClick={save}>{t('Save')}</Button>
           </>
         }
       >
         <div className="grid gap-3">
           <Input
             id="goal-name"
-            label="Goal name"
+            label={t('Goal name')}
             value={form.name}
             onChange={(event) => setForm({ ...form, name: event.target.value })}
           />
           <Input
             id="goal-target"
-            label="Target amount"
+            label={t('Target amount')}
             type="number"
             value={form.targetAmount}
             onChange={(event) => setForm({ ...form, targetAmount: event.target.value })}
           />
           <Input
             id="goal-current"
-            label="Current amount"
+            label={t('Current amount')}
             type="number"
             value={form.currentAmount}
             onChange={(event) => setForm({ ...form, currentAmount: event.target.value })}
           />
           <Input
             id="goal-date"
-            label="Target date"
+            label={t('Target date')}
             type="date"
             value={form.targetDate}
             onChange={(event) => setForm({ ...form, targetDate: event.target.value })}
@@ -124,14 +127,14 @@ export default function SavingsGoals() {
 
       <ConfirmDialog
         open={Boolean(pending)}
-        title="Delete savings goal?"
-        description="This savings goal will be permanently removed."
-        confirmLabel="Delete"
+        title={t('Delete savings goal?')}
+        description={t('This savings goal will be permanently removed.')}
+        confirmLabel={t('Delete')}
         onClose={() => setPending(null)}
         onConfirm={async () => {
           await removeGoal(pending.id)
           setPending(null)
-          push('Goal deleted.', 'success')
+          push(t('Goal deleted.'), 'success')
         }}
       />
     </div>

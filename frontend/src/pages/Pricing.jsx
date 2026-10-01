@@ -5,9 +5,11 @@ import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { getEsewaPlusPlan, initiateEsewaPayment } from '../config/services'
 import { FiUser, FiHome, FiArrowRight } from 'react-icons/fi'
+import { useLanguage } from '../contexts/useLanguage'
 
 export default function Pricing() {
   const navigate = useNavigate()
+  const { t } = useLanguage()
   const { isAuthenticated } = useAuth()
   const [plan, setPlan] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -53,7 +55,7 @@ export default function Pricing() {
     <main className="mx-auto max-w-5xl px-4 py-16">
       <div className="text-center">
         <h1 className="text-3xl font-semibold tracking-tight">
-          Simple, transparent pricing
+          {t('Simple, transparent pricing')}
         </h1>
       </div>
 
@@ -69,9 +71,9 @@ export default function Pricing() {
           },
           {
             name: 'Plus',
-            price: plan?.enabled
-              ? `NPR ${plan.amount} for ${plan.durationDays} days · one-time payment`
-              : 'Unavailable',
+            price: plan?.enabled ? null : t('Unavailable'),
+            amount: plan?.amount,
+            durationDays: plan?.durationDays,
             icon: FiHome,
             iconColor: 'text-emerald-700',
             iconBg: 'bg-emerald-100 dark:bg-emerald-950',
@@ -98,12 +100,14 @@ export default function Pricing() {
 
                 {/* Plan name */}
                 <div className="mt-5 flex items-center justify-between">
-                  <h2 className="text-xl font-semibold">{item.name}</h2>
+                  <h2 className="text-xl font-semibold">{t(item.name)}</h2>
                 </div>
 
                 {/* Price */}
                 <p className="mt-2 text-sm font-medium text-slate-500 dark:text-slate-400">
-                  {item.price}
+                  {item.price || (item.name === 'Plus' && plan?.enabled
+                    ? <>NPR {item.amount} {t('for')} {item.durationDays} {t('days')} · {t('one-time payment')}</>
+                    : t('Free'))}
                 </p>
 
                 {/* Features */}
@@ -116,7 +120,7 @@ export default function Pricing() {
                       <span className="flex h-5 w-5 items-center justify-center rounded-full bg-emerald-100 text-xs text-emerald-600 dark:bg-emerald-950 dark:text-emerald-400">
                         ✓
                       </span>
-                      {point}
+                      {t(point)}
                     </li>
                   ))}
                 </ul>
@@ -129,11 +133,11 @@ export default function Pricing() {
                 >
                   {item.name === 'Plus'
                     ? busy
-                      ? 'Opening eSewa...'
+                      ? t('Opening eSewa...')
                       : isAuthenticated
-                        ? 'Subscribe with eSewa'
-                        : 'Sign in to subscribe'
-                    : 'Create account'}
+                        ? t('Subscribe with eSewa')
+                        : t('Sign in to subscribe')
+                    : t('Create account')}
                   <FiArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
                 </Button>
               </div>
@@ -141,9 +145,9 @@ export default function Pricing() {
           )
         })}
       </div>
-      {error ? <p className="mt-4 text-center text-sm text-red-600" role="alert">{error}</p> : null}
+      {error ? <p className="mt-4 text-center text-sm text-red-600" role="alert">{t(error)}</p> : null}
       {!loading && !plan?.enabled && !error ? (
-        <p className="mt-4 text-center text-sm text-slate-500">Plus checkout is not configured yet.</p>
+        <p className="mt-4 text-center text-sm text-slate-500">{t('Plus checkout is not configured yet.')}</p>
       ) : null}
     </main>
   )

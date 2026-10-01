@@ -1,6 +1,7 @@
 import { Landmark, Smartphone, Wallet } from 'lucide-react'
 import Card from '../ui/Card'
 import { formatCurrency } from '../../utils/helpers'
+import { useLanguage } from '../../contexts/useLanguage'
 
 const icons = {
   bank: Landmark,
@@ -9,6 +10,7 @@ const icons = {
 }
 
 export default function AccountCard({ account, currency, onEdit, onDelete }) {
+  const { t } = useLanguage()
   const Icon = icons[account.type] || Wallet
 
   return (
@@ -20,17 +22,17 @@ export default function AccountCard({ account, currency, onEdit, onDelete }) {
           </span>
           <div>
             <h3 className="font-semibold">{account.name}</h3>
-            <p className="text-sm text-slate-500">{account.institution || account.provider || account.type}</p>
+            <p className="text-sm text-slate-500">{account.institution || account.provider || t(account.type)}</p>
           </div>
         </div>
         <p className="text-lg font-semibold">{formatCurrency(account.balance, currency)}</p>
       </div>
       <div className="mt-4 flex gap-2">
         <button type="button" className="text-sm text-indigo-600" onClick={() => onEdit(account)}>
-          Edit
+          {t('Edit')}
         </button>
         <button type="button" className="text-sm text-red-600" onClick={() => onDelete(account)}>
-          Delete
+          {t('Delete')}
         </button>
       </div>
     </Card>

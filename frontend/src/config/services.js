@@ -15,7 +15,11 @@ export async function apiRequest(path, options = {}) {
   const body = await response.json().catch(() => ({}))
 
   if (!response.ok || body.success === false) {
-    throw new Error(body.message || 'The request could not be completed.')
+    const error = new Error(body.message || 'The request could not be completed.')
+    error.validationErrors = Array.isArray(body.errors)
+      ? body.errors.map((issue) => ({ field: issue.path?.[0], message: issue.message }))
+      : []
+    throw error
   }
 
   return body

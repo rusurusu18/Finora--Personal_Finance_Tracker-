@@ -2,8 +2,11 @@ import { useState } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import Button from '../../components/ui/Button'
 import { apiRequest } from '../../config/services'
+import { FiKey } from 'react-icons/fi'
+import { useLanguage } from '../../contexts/useLanguage'
 
 export default function ResetPassword() {
+  const { t } = useLanguage()
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
 
@@ -39,37 +42,37 @@ export default function ResetPassword() {
     setMessage('')
 
     if (!formData.password || !formData.confirmPassword) {
-      setError('Please fill in all fields.')
+      setError(t('Please fill in all fields.'))
       return
     }
 
     if (formData.password.length < 8) {
-      setError('Password must be at least 8 characters.')
+      setError(t('Password must be at least 8 characters.'))
       return
     }
 
     if (!/[A-Z]/.test(formData.password)) {
-      setError('Password must contain at least one uppercase letter.')
+      setError(t('Password must contain at least one uppercase letter.'))
       return
     }
 
     if (!/[a-z]/.test(formData.password)) {
-      setError('Password must contain at least one lowercase letter.')
+      setError(t('Password must contain at least one lowercase letter.'))
       return
     }
 
     if (!/[0-9]/.test(formData.password)) {
-      setError('Password must contain at least one number.')
+      setError(t('Password must contain at least one number.'))
       return
     }
 
     if (formData.password !== formData.confirmPassword) {
-      setError('Passwords do not match.')
+      setError(t('Passwords do not match.'))
       return
     }
 
     if (!token) {
-      setError('Invalid or missing password reset token.')
+      setError(t('Invalid or missing password reset token.'))
       return
     }
 
@@ -81,9 +84,7 @@ export default function ResetPassword() {
         body: JSON.stringify({ token, password: formData.password }),
       })
 
-      setMessage(
-        response.message || 'Password reset successfully.'
-      )
+      setMessage(t(response.message || 'Password reset successfully.'))
 
       setFormData({
         password: '',
@@ -94,9 +95,7 @@ export default function ResetPassword() {
         navigate('/login')
       }, 2000)
     } catch (err) {
-      setError(
-        err.message || 'Something went wrong. Please try again.'
-      )
+      setError(t(err.message || 'Something went wrong. Please try again.'))
     } finally {
       setLoading(false)
     }
@@ -112,12 +111,13 @@ export default function ResetPassword() {
             Finora
           </p>
 
-          <h1 className="mt-2 text-3xl font-semibold text-slate-900 dark:text-white">
-            Reset your password
+          <h1 className="mt-2 flex items-center justify-center gap-2 text-3xl font-semibold text-slate-900 dark:text-white">
+            <FiKey className="h-6 w-6" aria-hidden="true" />
+            {t('Reset your password')}
           </h1>
 
           <p className="mt-3 text-slate-600 dark:text-slate-300">
-            Create a new password for your Finora account.
+            {t('Create a new password for your Finora account.')}
           </p>
         </div>
 
@@ -127,29 +127,28 @@ export default function ResetPassword() {
           {/* Error */}
           {error && (
             <div className="mb-5 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-900 dark:bg-red-950/40 dark:text-red-300">
-              {error}
+              {t(error)}
             </div>
           )}
 
           {/* Success */}
           {message && (
             <div className="mb-5 rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700 dark:border-green-900 dark:bg-green-950/40 dark:text-green-300">
-              {message}
+              {t(message)}
             </div>
           )}
 
           {!token ? (
             <div className="text-center">
               <p className="text-sm text-slate-600 dark:text-slate-300">
-                This password reset link is invalid or missing a
-                reset token.
+                {t('This password reset link is invalid or missing a reset token.')}
               </p>
 
               <Link
                 to="/forgot-password"
                 className="mt-5 inline-block text-sm font-medium text-indigo-600 hover:text-indigo-500"
               >
-                Request a new reset link
+                {t('Request a new reset link')}
               </Link>
             </div>
           ) : (
@@ -161,7 +160,7 @@ export default function ResetPassword() {
                   htmlFor="password"
                   className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-200"
                 >
-                  New Password
+                  {t('New password')}
                 </label>
 
                 <div className="relative">
@@ -171,7 +170,7 @@ export default function ResetPassword() {
                     type={showPassword ? 'text' : 'password'}
                     value={formData.password}
                     onChange={handleChange}
-                    placeholder="Enter your new password"
+                    placeholder={t('Enter your new password')}
                     autoComplete="new-password"
                     className="w-full rounded-lg border border-slate-300 bg-white px-4 py-3 pr-20 text-sm text-slate-900 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 dark:border-slate-600 dark:bg-slate-800 dark:text-white"
                   />
@@ -183,7 +182,7 @@ export default function ResetPassword() {
                     }
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-medium text-indigo-600 hover:text-indigo-500"
                   >
-                    {showPassword ? 'Hide' : 'Show'}
+                    {t(showPassword ? 'Hide' : 'Show')}
                   </button>
                 </div>
               </div>
@@ -194,7 +193,7 @@ export default function ResetPassword() {
                   htmlFor="confirmPassword"
                   className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-200"
                 >
-                  Confirm Password
+                  {t('Confirm password')}
                 </label>
 
                 <div className="relative">
@@ -208,7 +207,7 @@ export default function ResetPassword() {
                     }
                     value={formData.confirmPassword}
                     onChange={handleChange}
-                    placeholder="Confirm your new password"
+                    placeholder={t('Confirm your new password')}
                     autoComplete="new-password"
                     className="w-full rounded-lg border border-slate-300 bg-white px-4 py-3 pr-20 text-sm text-slate-900 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 dark:border-slate-600 dark:bg-slate-800 dark:text-white"
                   />
@@ -222,7 +221,7 @@ export default function ResetPassword() {
                     }
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-medium text-indigo-600 hover:text-indigo-500"
                   >
-                    {showConfirmPassword ? 'Hide' : 'Show'}
+                    {t(showConfirmPassword ? 'Hide' : 'Show')}
                   </button>
                 </div>
               </div>
@@ -230,14 +229,14 @@ export default function ResetPassword() {
               {/* Password Requirements */}
               <div className="rounded-lg bg-slate-50 p-4 dark:bg-slate-800/70">
                 <p className="text-xs font-medium text-slate-700 dark:text-slate-200">
-                  Password must contain:
+                  {t('Password must contain:')}
                 </p>
 
                 <ul className="mt-2 space-y-1 text-xs text-slate-500 dark:text-slate-400">
-                  <li>• At least 8 characters</li>
-                  <li>• At least one uppercase letter</li>
-                  <li>• At least one lowercase letter</li>
-                  <li>• At least one number</li>
+                  <li>• {t('At least 8 characters')}</li>
+                  <li>• {t('At least one uppercase letter')}</li>
+                  <li>• {t('At least one lowercase letter')}</li>
+                  <li>• {t('At least one number')}</li>
                 </ul>
               </div>
 
@@ -248,8 +247,8 @@ export default function ResetPassword() {
                 disabled={loading}
               >
                 {loading
-                  ? 'Resetting password...'
-                  : 'Reset Password'}
+                  ? t('Resetting password...')
+                  : t('Reset password')}
               </Button>
 
             </form>
@@ -261,7 +260,7 @@ export default function ResetPassword() {
               to="/login"
               className="text-sm font-medium text-indigo-600 hover:text-indigo-500"
             >
-              ← Back to Login
+              ← {t('Back to sign in')}
             </Link>
           </div>
         </div>

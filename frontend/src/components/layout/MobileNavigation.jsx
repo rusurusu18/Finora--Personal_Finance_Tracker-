@@ -16,7 +16,7 @@ export default function MobileNavigation() {
   return (
     <nav
       className="fixed inset-x-0 bottom-0 z-40 border-t border-slate-200 bg-white px-2 py-2 md:hidden dark:border-slate-800 dark:bg-slate-950"
-      aria-label="Mobile dashboard"
+      aria-label={t('Mobile dashboard')}
     >
       <ul className="grid grid-cols-5 gap-1">
         {items.map(({ to, label, icon: Icon, end }) => (

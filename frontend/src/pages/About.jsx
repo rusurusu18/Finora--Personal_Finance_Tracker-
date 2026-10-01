@@ -10,7 +10,10 @@ import {
   FiDatabase,
   FiLock,
   FiCheckCircle,
+  FiArrowRight,
+  FiGrid,
 } from 'react-icons/fi'
+import { useLanguage } from '../contexts/useLanguage'
 
 const values = [
   {
@@ -58,6 +61,7 @@ const stack = [
 
 export default function About() {
   const navigate = useNavigate()
+  const { t } = useLanguage()
 
   return (
     <main className="about-page">
@@ -65,16 +69,13 @@ export default function About() {
       {/* ── Hero ── */}
       <section className="about-hero">
         <div className="about-hero-inner">
-          <span className="about-badge">Our Story</span>
+          <span className="about-badge">{t('Our Story')}</span>
           <h1 className="about-title">
-            Built for Nepal.<br />
-            Designed for clarity.
+            {t('Built for Nepal.')}<br />
+            {t('Designed for clarity.')}
           </h1>
           <p className="about-subtitle">
-            Finora started as a frustration. Most finance apps are built for Western banking
-            systems — one bank account, one currency, credit cards everywhere. In Nepal,
-            money lives in bank accounts, eSewa wallets, Khalti, and cash simultaneously.
-            We built Finora to match that reality.
+            {t('Finora started as a frustration. Most finance apps are built for Western banking systems — one bank account, one currency, credit cards everywhere. In Nepal, money lives in bank accounts, eSewa wallets, Khalti, and cash simultaneously. We built Finora to match that reality.')}
           </p>
         </div>
       </section>
@@ -84,15 +85,12 @@ export default function About() {
         <div className="about-container">
           <div className="about-mission-grid">
             <div>
-              <h2 className="about-section-title">Our Mission</h2>
+              <h2 className="about-section-title">{t('Our Mission')}</h2>
               <p className="about-body-text">
-                To give every Nepali a clear, unified view of their finances — regardless
-                of how many wallets, banks, or cash envelopes they juggle daily.
+                {t('To give every Nepali a clear, unified view of their finances — regardless of how many wallets, banks, or cash envelopes they juggle daily.')}
               </p>
               <p className="about-body-text" style={{ marginTop: '1rem' }}>
-                We believe financial clarity is not a luxury. It is the foundation of
-                every good decision: whether to save for a motorbike, plan a trek, or
-                support a family back home.
+                {t('We believe financial clarity is not a luxury. It is the foundation of every good decision: whether to save for a motorbike, plan a trek, or support a family back home.')}
               </p>
             </div>
             <div className="about-mission-stat-grid">
@@ -104,7 +102,7 @@ export default function About() {
               ].map(({ num, label }) => (
                 <div key={label} className="about-stat-card">
                   <span className="about-stat-num">{num}</span>
-                  <span className="about-stat-label">{label}</span>
+                  <span className="about-stat-label">{t(label)}</span>
                 </div>
               ))}
             </div>
@@ -115,9 +113,9 @@ export default function About() {
       {/* ── Values ── */}
       <section className="about-section about-values-section">
         <div className="about-container">
-          <h2 className="about-section-title centered">What we stand for</h2>
+          <h2 className="about-section-title centered">{t('What we stand for')}</h2>
           <p className="about-section-sub centered">
-            Four principles guide every decision we make at Finora.
+            {t('Four principles guide every decision we make at Finora.')}
           </p>
           <div className="about-values-grid">
             {values.map(({ icon: Icon, title, description, color, background }) => (
@@ -132,9 +130,9 @@ export default function About() {
                   <Icon />
                 </div>
 
-                <h3 className="about-value-title">{title}</h3>
+                <h3 className="about-value-title">{t(title)}</h3>
 
-                <p className="about-value-desc">{description}</p>
+                <p className="about-value-desc">{t(description)}</p>
               </div>
             ))}
           </div>
@@ -144,9 +142,9 @@ export default function About() {
       {/* ── Tech Stack ── */}
       <section className="about-section about-stack-section">
         <div className="about-container">
-          <h2 className="about-section-title centered">Built with</h2>
+          <h2 className="about-section-title centered">{t('Built with')}</h2>
           <p className="about-section-sub centered">
-            Boring, proven technology — because your money deserves reliability over hype.
+            {t('Boring, proven technology — because your money deserves reliability over hype.')}
           </p>
           <div className="about-stack-grid">
             {stack.map(({ label, tech, icon: Icon }) => (
@@ -157,7 +155,7 @@ export default function About() {
                   </div>
 
                   <div>
-                    <span className="about-stack-label">{label}</span>
+                    <span className="about-stack-label">{t(label)}</span>
                     <span className="about-stack-tech">{tech}</span>
                   </div>
                 </div>
@@ -171,16 +169,18 @@ export default function About() {
       {/* ── CTA ── */}
       <section className="about-section about-cta-section">
         <div className="about-container about-cta-inner">
-          <h2 className="about-cta-title">Ready to take control?</h2>
+          <h2 className="about-cta-title">{t('Ready to take control?')}</h2>
           <p className="about-cta-sub">
-            Join Finora for free. No credit card. No BS.
+            {t('Join Finora for free. No credit card. No BS.')}
           </p>
           <div className="about-cta-buttons">
             <button className="btn-primary" onClick={() => navigate('/register')}>
-              Get Started Free
+              <FiArrowRight aria-hidden="true" />
+              {t('Get Started Free')}
             </button>
             <button className="btn-ghost" onClick={() => navigate('/features')}>
-              See Features
+              <FiGrid aria-hidden="true" />
+              {t('See Features')}
             </button>
           </div>
         </div>
@@ -438,6 +438,9 @@ export default function About() {
           flex-wrap: wrap;
         }
         .btn-primary {
+          display: inline-flex;
+          align-items: center;
+          gap: 0.5rem;
           background: #fff;
           color: #6366f1;
           border: none;
@@ -453,6 +456,9 @@ export default function About() {
           box-shadow: 0 6px 20px rgba(0,0,0,0.2);
         }
         .btn-ghost {
+          display: inline-flex;
+          align-items: center;
+          gap: 0.5rem;
           background: transparent;
           color: #fff;
           border: 2px solid rgba(255,255,255,0.6);

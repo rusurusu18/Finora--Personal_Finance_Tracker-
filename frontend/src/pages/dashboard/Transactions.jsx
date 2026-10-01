@@ -11,6 +11,8 @@ import Modal from '../../components/ui/Modal'
 import Select from '../../components/ui/Select'
 import { TRANSACTION_TYPES } from '../../utils/constants'
 import { hasErrors, validateTransaction } from '../../utils/validators'
+import { FiPlus } from 'react-icons/fi'
+import { useLanguage } from '../../contexts/useLanguage'
 
 const emptyForm = () => ({
   title: '',
@@ -24,6 +26,7 @@ const emptyForm = () => ({
 })
 
 export default function Transactions() {
+  const { t } = useLanguage()
   const { transactions, categories, accounts, settings, addTransaction, editTransaction, removeTransaction } =
     useFinance()
   const { push } = useToast()
@@ -110,10 +113,10 @@ export default function Transactions() {
 
     if (editingId) {
       await editTransaction(editingId, payload)
-      push('Transaction updated.', 'success')
+      push(t('Transaction updated.'), 'success')
     } else {
       await addTransaction(payload)
-      push('Transaction added.', 'success')
+      push(t('Transaction added.'), 'success')
     }
     setOpen(false)
   }
@@ -122,10 +125,10 @@ export default function Transactions() {
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Transactions</h1>
-          <p className="text-sm text-slate-500">Search, filter, and manage your recorded activity.</p>
+          <h1 className="text-2xl font-semibold tracking-tight">{t('Transactions')}</h1>
+          <p className="text-sm text-slate-500">{t('Search, filter, and manage your recorded activity.')}</p>
         </div>
-        <Button onClick={openCreate}>Add transaction</Button>
+        <Button onClick={openCreate}><FiPlus aria-hidden="true" />{t('Add transaction')}</Button>
       </div>
 
       <TransactionFilters filters={filters} categories={categories} onChange={setFilters} />
@@ -140,28 +143,28 @@ export default function Transactions() {
 
       <Modal
         open={open}
-        title={editingId ? 'Edit transaction' : 'Add transaction'}
+        title={t(editingId ? 'Edit transaction' : 'Add transaction')}
         onClose={() => setOpen(false)}
         footer={
           <>
             <Button variant="secondary" onClick={() => setOpen(false)}>
-              Cancel
+              {t('Cancel')}
             </Button>
-            <Button onClick={handleSave}>Save</Button>
+            <Button onClick={handleSave}>{t('Save')}</Button>
           </>
         }
       >
         <div className="grid gap-3">
           <Input
             id="title"
-            label="Title"
+            label={t('Title')}
             value={form.title}
             error={errors.title}
             onChange={(event) => setForm({ ...form, title: event.target.value })}
           />
           <Input
             id="amount"
-            label="Amount"
+            label={t('Amount')}
             type="number"
             value={form.amount}
             error={errors.amount}
@@ -169,31 +172,31 @@ export default function Transactions() {
           />
           <Select
             id="type"
-            label="Type"
+            label={t('Type')}
             value={form.type}
             onChange={(event) => setForm({ ...form, type: event.target.value })}
           >
             {TRANSACTION_TYPES.map((item) => (
               <option key={item.value} value={item.value}>
-                {item.label}
+                {t(item.label)}
               </option>
             ))}
           </Select>
           <Select
             id="category"
-            label="Category"
+            label={t('Category')}
             value={form.category}
             onChange={(event) => setForm({ ...form, category: event.target.value })}
           >
             {categories.filter((item) => item.type === form.type).map((item) => (
               <option key={item.id} value={item.name}>
-                {item.name}
+                {t(item.name)}
               </option>
             ))}
           </Select>
           <Select
             id="transaction-account"
-            label="Account"
+            label={t('Account')}
             value={form.accountId}
             error={errors.accountId}
             onChange={(event) => {
@@ -201,7 +204,7 @@ export default function Transactions() {
               setForm({ ...form, accountId: event.target.value, paymentSource: account?.name || '' })
             }}
           >
-            <option value="">Select an account</option>
+            <option value="">{t('Select an account')}</option>
             {accounts.map((account) => (
               <option key={account.id} value={account.id}>
                 {account.name}
@@ -210,7 +213,7 @@ export default function Transactions() {
           </Select>
           <Input
             id="date"
-            label="Date"
+            label={t('Date')}
             type="date"
             value={form.date}
             error={errors.date}
@@ -218,7 +221,7 @@ export default function Transactions() {
           />
           <Input
             id="description"
-            label="Description"
+            label={t('Description')}
             value={form.description}
             onChange={(event) => setForm({ ...form, description: event.target.value })}
           />
@@ -227,14 +230,14 @@ export default function Transactions() {
 
       <ConfirmDialog
         open={Boolean(pendingDelete)}
-        title="Delete transaction?"
-        description="This permanently removes the transaction from your account."
-        confirmLabel="Delete"
+        title={t('Delete transaction?')}
+        description={t('This permanently removes the transaction from your account.')}
+        confirmLabel={t('Delete')}
         onClose={() => setPendingDelete(null)}
         onConfirm={async () => {
           await removeTransaction(pendingDelete.id)
           setPendingDelete(null)
-          push('Transaction deleted.', 'success')
+          push(t('Transaction deleted.'), 'success')
         }}
       />
     </div>

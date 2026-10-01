@@ -3,7 +3,6 @@ import {
   ChartColumn,
   CreditCard,
   Flag,
-  Languages,
   LayoutDashboard,
   Receipt,
   Settings,
@@ -20,6 +19,5 @@ export const dashboardLinks = [
   { to: '/dashboard/savings', label: 'Savings', icon: Flag },
   { to: '/dashboard/reports', label: 'Reports', icon: CreditCard },
   { to: '/dashboard/notifications', label: 'Notifications', icon: Bell },
-  { to: '/dashboard/translator', label: 'Translator', icon: Languages },
   { to: '/dashboard/settings', label: 'Settings', icon: Settings },
 ]

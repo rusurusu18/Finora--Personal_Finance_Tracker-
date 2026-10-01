@@ -24,6 +24,15 @@ export function isPassword(value) {
   return ''
 }
 
+export function isStrongPassword(value) {
+  const lengthError = isPassword(value)
+  if (lengthError) return lengthError
+  if (!/[A-Z]/.test(value)) return 'Password must contain at least one uppercase letter.'
+  if (!/[a-z]/.test(value)) return 'Password must contain at least one lowercase letter.'
+  if (!/[0-9]/.test(value)) return 'Password must contain at least one number.'
+  return ''
+}
+
 export function isAmount(value) {
   const required = isRequired(value, 'Amount')
   if (required) return required
@@ -51,12 +60,13 @@ export function validateLogin({ email, password }) {
 }
 
 export function validateRegister({ name, email, password, confirmPassword }) {
+  const passwordError = isStrongPassword(password)
   return {
     name: isName(name, 'Full name'),
     email: isEmail(email),
-    password: isPassword(password),
+    password: passwordError,
     confirmPassword:
-      password !== confirmPassword ? 'Passwords do not match.' : isPassword(confirmPassword),
+      password !== confirmPassword ? 'Passwords do not match.' : passwordError,
   }
 }
 

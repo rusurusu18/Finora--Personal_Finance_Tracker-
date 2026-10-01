@@ -29,7 +29,7 @@ export default function AdminLayout() {
           <button
             type="button"
             className="absolute inset-0 bg-slate-900/50"
-            aria-label="Close navigation drawer"
+            aria-label={t('Close navigation drawer')}
             onClick={() => setDrawerOpen(false)}
           />
           <div className="relative h-full w-72 bg-white p-4 dark:bg-slate-950">

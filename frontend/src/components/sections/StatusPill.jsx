@@ -1,7 +1,9 @@
 import Badge from '../ui/Badge'
+import { useLanguage } from '../../contexts/useLanguage'
 
 export default function StatusPill({ progress }) {
-  if (progress >= 100) return <Badge tone="danger">Over budget</Badge>
-  if (progress >= 80) return <Badge tone="warning">Watch</Badge>
-  return <Badge tone="success">On track</Badge>
+  const { t } = useLanguage()
+  if (progress >= 100) return <Badge tone="danger">{t('Over budget')}</Badge>
+  if (progress >= 80) return <Badge tone="warning">{t('Watch')}</Badge>
+  return <Badge tone="success">{t('On track')}</Badge>
 }

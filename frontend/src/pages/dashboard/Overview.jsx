@@ -12,8 +12,20 @@ import SectionCard from '../../components/sections/SectionCard'
 import Skeleton from '../../components/ui/Skeleton'
 import { getCategorySpending, getMonthlyTrend } from '../../utils/dashboardData'
 import { getGreeting } from '../../utils/helpers'
+import { useLanguage } from '../../contexts/useLanguage'
+import {
+  FiActivity,
+  FiArrowDownLeft,
+  FiArrowUpRight,
+  FiCreditCard,
+  FiList,
+  FiPieChart,
+  FiTarget,
+  FiTrendingUp,
+} from 'react-icons/fi'
 
 export default function Overview() {
+  const { t } = useLanguage()
   const { user } = useAuth()
   const { loading, totals, monthStats, budgetRemaining, transactions, budgets, savingsGoals, settings } =
     useFinance()
@@ -35,44 +47,44 @@ export default function Overview() {
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-semibold tracking-tight">
-          {getGreeting()} 👋
+          {t(getGreeting())} 👋
         </h1>
         <p className="mt-1 text-slate-500">
-          Here&apos;s your financial picture{user?.name ? `, ${user.name.split(' ')[0]}` : ''}.
+          {t("Here's your financial picture")}{user?.name ? `, ${user.name.split(' ')[0]}` : ''}.
         </p>
       </div>
 
       <FinancialSummary total={totals.total} currency={currency} />
 
       <div className="grid gap-4 md:grid-cols-3">
-        <MoneySourceCard label="Bank" amount={totals.bank} currency={currency} />
-        <MoneySourceCard label="Wallets" amount={totals.wallets} currency={currency} />
-        <MoneySourceCard label="Cash" amount={totals.cash} currency={currency} />
+        <MoneySourceCard label={t('Bank')} amount={totals.bank} currency={currency} icon={FiArrowUpRight} />
+        <MoneySourceCard label={t('Wallets')} amount={totals.wallets} currency={currency} icon={FiCreditCard} />
+        <MoneySourceCard label={t('Cash')} amount={totals.cash} currency={currency} icon={FiArrowDownLeft} />
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-        <StatCard label="Income" value={monthStats.income} currency={currency} />
-        <StatCard label="Expenses" value={monthStats.expenses} currency={currency} />
-        <StatCard label="Savings" value={monthStats.savings} currency={currency} />
-        <StatCard label="Budget remaining" value={budgetRemaining} currency={currency} />
+        <StatCard label={t('Income')} value={monthStats.income} currency={currency} icon={FiArrowDownLeft} />
+        <StatCard label={t('Expenses')} value={monthStats.expenses} currency={currency} icon={FiArrowUpRight} />
+        <StatCard label={t('Savings')} value={monthStats.savings} currency={currency} icon={FiTrendingUp} />
+        <StatCard label={t('Budget remaining')} value={budgetRemaining} currency={currency} icon={FiPieChart} />
       </div>
 
       <div className="grid gap-4 xl:grid-cols-2">
-        <SectionCard title="Income vs expense" description="Monthly totals from your recorded transactions.">
+        <SectionCard icon={FiActivity} title={t('Income vs expense')} description={t('Monthly totals from your recorded transactions.')}>
           <AreaChart data={trend} currency={currency} />
         </SectionCard>
         <SpendingOverview data={categories} currency={currency} />
       </div>
 
       <div className="grid gap-4 lg:grid-cols-2">
-        <SectionCard title="Budgets">
+        <SectionCard icon={FiPieChart} title={t('Budgets')}>
           <div className="grid gap-4">
             {budgets.slice(0, 3).map((budget) => (
               <BudgetCard key={budget.id} budget={budget} currency={currency} />
             ))}
           </div>
         </SectionCard>
-        <SectionCard title="Savings goals">
+        <SectionCard icon={FiTarget} title={t('Savings goals')}>
           <div className="grid gap-4">
             {savingsGoals.slice(0, 3).map((goal) => (
               <SavingsGoalCard key={goal.id} goal={goal} currency={currency} />
@@ -81,7 +93,7 @@ export default function Overview() {
         </SectionCard>
       </div>
 
-      <SectionCard title="Recent transactions">
+      <SectionCard icon={FiList} title={t('Recent transactions')}>
         <TransactionList transactions={transactions.slice(0, 6)} currency={currency} />
       </SectionCard>
     </div>

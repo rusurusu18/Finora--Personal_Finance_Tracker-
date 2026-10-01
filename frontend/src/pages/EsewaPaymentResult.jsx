@@ -3,8 +3,10 @@ import { Link, useLocation } from 'react-router-dom'
 import Card from '../components/ui/Card'
 import { verifyEsewaPayment } from '../config/services'
 import { useAuth } from '../contexts/AuthContext'
+import { useLanguage } from '../contexts/useLanguage'
 
 export default function EsewaPaymentResult() {
+  const { t } = useLanguage()
   const location = useLocation()
   const { isAuthenticated } = useAuth()
   const succeeded = location.pathname.endsWith('/success')
@@ -45,18 +47,18 @@ export default function EsewaPaymentResult() {
   return (
     <main className="mx-auto max-w-xl px-4 py-16">
       <Card className="p-6">
-        <h1 className="text-xl font-semibold">{heading}</h1>
+        <h1 className="text-xl font-semibold">{t(heading)}</h1>
         <p className="mt-3 text-sm text-slate-600 dark:text-slate-300">
-          {status === 'complete'
+          {t(status === 'complete'
             ? 'eSewa confirmed the payment and your Plus access is active.'
             : status === 'verifying'
               ? 'Checking the payment directly with eSewa.'
               : status === 'failed'
                 ? 'The payment was cancelled or not completed. No Plus access was granted.'
-                : message}
+                : message)}
         </p>
         <Link className="mt-5 inline-block text-sm text-indigo-600" to={isAuthenticated ? '/dashboard' : '/login'}>
-          {isAuthenticated ? 'Go to dashboard' : 'Sign in'}
+          {t(isAuthenticated ? 'Go to dashboard' : 'Sign in')}
         </Link>
       </Card>
     </main>

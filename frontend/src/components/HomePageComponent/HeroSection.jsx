@@ -1,5 +1,6 @@
 import Button from '../ui/Button'
 import { useLanguage } from '../../contexts/useLanguage'
+import { FiLogIn, FiUserPlus } from 'react-icons/fi'
 
 export default function HeroSection({ onGetStarted, onSignIn }) {
   const { t } = useLanguage()
@@ -15,8 +16,9 @@ export default function HeroSection({ onGetStarted, onSignIn }) {
           {t('Finora brings bank accounts, cash, eSewa, Khalti, and Fonepay into one calm picture so you can track spending, set budgets, and see whether your goals are realistic.')}
         </p>
         <div className="mt-8 flex flex-wrap gap-3">
-          <Button onClick={onGetStarted}>{t('Get Started')}</Button>
+          <Button onClick={onGetStarted}><FiUserPlus aria-hidden="true" />{t('Get Started')}</Button>
           <Button variant="secondary" onClick={onSignIn}>
+            <FiLogIn aria-hidden="true" />
             {t('Sign in')}
           </Button>
         </div>

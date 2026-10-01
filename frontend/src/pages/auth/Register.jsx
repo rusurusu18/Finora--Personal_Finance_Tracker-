@@ -4,9 +4,13 @@ import { useAuth } from '../../contexts/AuthContext'
 import Button from '../../components/ui/Button'
 import Card from '../../components/ui/Card'
 import Input from '../../components/ui/Input'
+import PasswordInput from '../../components/ui/PasswordInput'
+import { FiUserPlus } from 'react-icons/fi'
+import { useLanguage } from '../../contexts/useLanguage'
 
 export default function Register() {
   const { register } = useAuth()
+  const { t } = useLanguage()
   const navigate = useNavigate()
   const [form, setForm] = useState({
     name: '',
@@ -32,47 +36,49 @@ export default function Register() {
 
   return (
     <Card className="p-6">
-      <h1 className="text-xl font-semibold">Create your Finora account</h1>
+      <h1 className="flex items-center gap-2 text-xl font-semibold">
+        <FiUserPlus className="h-5 w-5 text-slate-500" aria-hidden="true" />
+        {t('Create your Finora account')}
+      </h1>
       <form className="mt-6 space-y-4" onSubmit={handleSubmit} noValidate>
-        <Input id="name" name="name" label="Full name" value={form.name} error={errors.name} onChange={update} />
+        <Input id="name" name="name" label={t('Full name')} value={form.name} error={errors.name ? t(errors.name) : ''} onChange={update} />
         <Input
           id="email"
           name="email"
           type="email"
-          label="Email"
+          label={t('Email')}
           value={form.email}
-          error={errors.email}
+          error={errors.email ? t(errors.email) : ''}
           onChange={update}
         />
-        <Input
+        <PasswordInput
           id="password"
           name="password"
-          type="password"
-          label="Password"
+          label={t('Password')}
           value={form.password}
-          error={errors.password}
+          error={errors.password ? t(errors.password) : ''}
           onChange={update}
           autoComplete="new-password"
         />
-        <Input
+        <p className="-mt-2 text-xs text-slate-500">{t('Use at least 8 characters with uppercase, lowercase, and a number.')}</p>
+        <PasswordInput
           id="confirmPassword"
           name="confirmPassword"
-          type="password"
-          label="Confirm password"
+          label={t('Confirm password')}
           value={form.confirmPassword}
-          error={errors.confirmPassword}
+          error={errors.confirmPassword ? t(errors.confirmPassword) : ''}
           onChange={update}
           autoComplete="new-password"
         />
-        {errors.form ? <p className="text-sm text-red-600">{errors.form}</p> : null}
+        {errors.form ? <p className="text-sm text-red-600">{t(errors.form)}</p> : null}
         <Button type="submit" className="w-full">
-          Get started
+          {t('Get started')}
         </Button>
       </form>
       <p className="mt-4 text-sm text-slate-500">
-        Already have an account?{' '}
+        {t('Already have an account?')}{' '}
         <Link to="/login" className="text-indigo-600">
-          Sign in
+          {t('Sign in')}
         </Link>
       </p>
     </Card>

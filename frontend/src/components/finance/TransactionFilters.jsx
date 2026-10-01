@@ -1,8 +1,10 @@
 import Input from '../ui/Input'
 import Select from '../ui/Select'
 import { TRANSACTION_TYPES } from '../../utils/constants'
+import { useLanguage } from '../../contexts/useLanguage'
 
 export default function TransactionFilters({ filters, onChange, categories }) {
+  const { t } = useLanguage()
   function update(key, value) {
     onChange({ ...filters, [key]: value })
   }
@@ -11,48 +13,48 @@ export default function TransactionFilters({ filters, onChange, categories }) {
     <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-5">
       <Input
         id="search"
-        label="Search"
-        placeholder="Salary, rent, eSewa..."
+        label={t('Search')}
+        placeholder={t('Salary, rent, eSewa...')}
         value={filters.search}
         onChange={(event) => update('search', event.target.value)}
       />
-      <Select id="type" label="Type" value={filters.type} onChange={(event) => update('type', event.target.value)}>
-        <option value="">All types</option>
+      <Select id="type" label={t('Type')} value={filters.type} onChange={(event) => update('type', event.target.value)}>
+        <option value="">{t('All types')}</option>
         {TRANSACTION_TYPES.map((item) => (
           <option key={item.value} value={item.value}>
-            {item.label}
+            {t(item.label)}
           </option>
         ))}
       </Select>
       <Select
         id="category"
-        label="Category"
+        label={t('Category')}
         value={filters.category}
         onChange={(event) => update('category', event.target.value)}
       >
-        <option value="">All categories</option>
+        <option value="">{t('All categories')}</option>
         {categories.map((item) => (
           <option key={item.id} value={item.name}>
-            {item.name}
+            {t(item.name)}
           </option>
         ))}
       </Select>
-      <Select id="sort" label="Sort" value={filters.sort} onChange={(event) => update('sort', event.target.value)}>
-        <option value="date-desc">Newest first</option>
-        <option value="date-asc">Oldest first</option>
-        <option value="amount-desc">Amount high to low</option>
-        <option value="amount-asc">Amount low to high</option>
+      <Select id="sort" label={t('Sort')} value={filters.sort} onChange={(event) => update('sort', event.target.value)}>
+        <option value="date-desc">{t('Newest first')}</option>
+        <option value="date-asc">{t('Oldest first')}</option>
+        <option value="amount-desc">{t('Amount high to low')}</option>
+        <option value="amount-asc">{t('Amount low to high')}</option>
       </Select>
       <Input
         id="from"
-        label="From"
+        label={t('From')}
         type="date"
         value={filters.from}
         onChange={(event) => update('from', event.target.value)}
       />
       <Input
         id="to"
-        label="To"
+        label={t('To')}
         type="date"
         value={filters.to}
         onChange={(event) => update('to', event.target.value)}

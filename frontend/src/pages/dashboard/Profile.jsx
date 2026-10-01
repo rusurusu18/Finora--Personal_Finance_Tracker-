@@ -2,9 +2,11 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import Button from '../../components/ui/Button'
 import { useAuth } from '../../contexts/AuthContext'
+import { useLanguage } from '../../contexts/useLanguage'
 
 export default function Profile() {
   const { user, updateProfile } = useAuth()
+  const { t } = useLanguage()
 
   const [formData, setFormData] = useState(() => ({
     fullName: user?.fullName || user?.name || '',
@@ -35,12 +37,12 @@ export default function Profile() {
     setError('')
 
     if (!formData.fullName.trim()) {
-      setError('Full name is required.')
+      setError(t('Full name is required.'))
       return
     }
 
     if (formData.fullName.trim().length < 2) {
-      setError('Full name must be at least 2 characters.')
+      setError(t('Full name must be at least 2 characters.'))
       return
     }
 
@@ -52,11 +54,11 @@ export default function Profile() {
         phone: formData.phone,
       })
 
-      setMessage('Profile updated successfully.')
+      setMessage(t('Profile updated successfully.'))
     } catch (err) {
       setError(
         err.message ||
-          'Something went wrong. Please try again.'
+          t('Something went wrong. Please try again.')
       )
     } finally {
       setLoading(false)
@@ -69,15 +71,15 @@ export default function Profile() {
       {/* Page Header */}
       <div className="mb-8">
         <p className="text-sm font-medium text-indigo-600">
-          Account
+          {t('Account')}
         </p>
 
         <h1 className="mt-1 text-2xl font-semibold text-slate-900 dark:text-white">
-          Profile
+          {t('Profile')}
         </h1>
 
         <p className="mt-2 text-sm text-slate-600 dark:text-slate-300">
-          Manage your personal information and account details.
+          {t('Manage your personal information and account details.')}
         </p>
       </div>
 
@@ -107,15 +109,15 @@ export default function Profile() {
                 ? formData.fullName
                     .charAt(0)
                     .toUpperCase()
-                : 'U'}
+                : t('User')}
             </div>
 
             <h2 className="mt-4 text-lg font-semibold text-slate-900 dark:text-white">
-              {formData.fullName || 'User'}
+              {formData.fullName || t('User')}
             </h2>
 
             <p className="mt-1 break-all text-sm text-slate-500 dark:text-slate-400">
-              {formData.email || 'No email available'}
+              {formData.email || t('No email available')}
             </p>
 
             {user?.role && (
@@ -128,24 +130,24 @@ export default function Profile() {
           <div className="mt-6 border-t border-slate-200 pt-5 dark:border-slate-700">
 
             <p className="text-xs font-medium uppercase tracking-wide text-slate-400">
-              Account
+              {t('Account')}
             </p>
 
             <div className="mt-3 space-y-3 text-sm">
 
               <div className="flex justify-between gap-4">
                 <span className="text-slate-500 dark:text-slate-400">
-                  Status
+                  {t('Status')}
                 </span>
 
                 <span className="font-medium text-green-600">
-                  Active
+                  {t('Active')}
                 </span>
               </div>
 
               <div className="flex justify-between gap-4">
                 <span className="text-slate-500 dark:text-slate-400">
-                  Email
+                  {t('Email')}
                 </span>
 
                 <span className="max-w-45 truncate font-medium text-slate-700 dark:text-slate-200">
@@ -164,11 +166,11 @@ export default function Profile() {
 
             <div className="mb-6">
               <h2 className="text-lg font-semibold text-slate-900 dark:text-white">
-                Personal Information
+                {t('Personal Information')}
               </h2>
 
               <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-                Update the information associated with your account.
+                {t('Update the information associated with your account.')}
               </p>
             </div>
 
@@ -183,7 +185,7 @@ export default function Profile() {
                   htmlFor="fullName"
                   className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-200"
                 >
-                  Full Name
+                  {t('Full name')}
                 </label>
 
                 <input
@@ -192,7 +194,7 @@ export default function Profile() {
                   type="text"
                   value={formData.fullName}
                   onChange={handleChange}
-                  placeholder="Enter your full name"
+                  placeholder={t('Enter your full name')}
                   className="w-full rounded-lg border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 dark:border-slate-600 dark:bg-slate-800 dark:text-white"
                 />
               </div>
@@ -203,7 +205,7 @@ export default function Profile() {
                   htmlFor="email"
                   className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-200"
                 >
-                  Email Address
+                  {t('Email Address')}
                 </label>
 
                 <input
@@ -216,7 +218,7 @@ export default function Profile() {
                 />
 
                 <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">
-                  Email address cannot be changed from this page.
+                  {t('Email address cannot be changed from this page.')}
                 </p>
               </div>
 
@@ -226,7 +228,7 @@ export default function Profile() {
                   htmlFor="phone"
                   className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-200"
                 >
-                  Phone Number
+                  {t('Phone Number')}
                 </label>
 
                 <input
@@ -235,7 +237,7 @@ export default function Profile() {
                   type="tel"
                   value={formData.phone}
                   onChange={handleChange}
-                  placeholder="Enter your phone number"
+                  placeholder={t('Enter your phone number')}
                   className="w-full rounded-lg border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 dark:border-slate-600 dark:bg-slate-800 dark:text-white"
                 />
               </div>
@@ -248,8 +250,8 @@ export default function Profile() {
                   disabled={loading}
                 >
                   {loading
-                    ? 'Saving...'
-                    : 'Save Changes'}
+                    ? t('Saving...')
+                    : t('Save Changes')}
                 </Button>
 
                 <Link to="/dashboard/settings">
@@ -257,7 +259,7 @@ export default function Profile() {
                     type="button"
                     variant="secondary"
                   >
-                    Settings
+                    {t('Settings')}
                   </Button>
                 </Link>
 
@@ -270,28 +272,28 @@ export default function Profile() {
           <div className="mt-6 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-900">
 
             <h2 className="text-lg font-semibold text-slate-900 dark:text-white">
-              Security
+              {t('Security')}
             </h2>
 
             <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-              Keep your Finora account secure.
+              {t('Keep your Finora account secure.')}
             </p>
 
             <div className="mt-5 flex flex-col gap-4 rounded-xl bg-slate-50 p-4 dark:bg-slate-800/70 sm:flex-row sm:items-center sm:justify-between">
 
               <div>
                 <p className="text-sm font-medium text-slate-900 dark:text-white">
-                  Password
+                  {t('Password')}
                 </p>
 
                 <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-                  Change your account password regularly.
+                  {t('Change your account password regularly.')}
                 </p>
               </div>
 
               <Link to="/dashboard/settings">
                 <Button variant="secondary">
-                  Change Password
+                  {t('Change Password')}
                 </Button>
               </Link>
 

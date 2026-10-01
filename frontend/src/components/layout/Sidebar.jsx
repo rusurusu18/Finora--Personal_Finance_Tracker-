@@ -10,7 +10,7 @@ export default function Sidebar() {
       <div className="flex h-16 items-center px-5">
         <span className="text-lg font-semibold tracking-tight">FINORA</span>
       </div>
-      <nav className="flex flex-1 flex-col gap-1 px-3 pb-6" aria-label="Dashboard">
+      <nav className="flex flex-1 flex-col gap-1 px-3 pb-6" aria-label={t('Dashboard')}>
         {dashboardLinks.map(({ to, label, icon: Icon, end }) => (
           <NavLink
             key={to}

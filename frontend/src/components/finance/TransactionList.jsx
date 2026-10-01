@@ -1,6 +1,7 @@
 import TransactionCard from './TransactionCard'
 import EmptyState from '../ui/EmptyState'
 import { formatCurrency, formatDate } from '../../utils/helpers'
+import { useLanguage } from '../../contexts/useLanguage'
 
 export default function TransactionList({
   transactions,
@@ -9,12 +10,13 @@ export default function TransactionList({
   onDelete,
   onAdd,
 }) {
+  const { t } = useLanguage()
   if (!transactions.length) {
     return (
       <EmptyState
-        title="No transactions match"
-        description="Try clearing filters or add a new transaction."
-        actionLabel="Add transaction"
+        title={t('No transactions match')}
+        description={t('Try clearing filters or add a new transaction.')}
+        actionLabel={t('Add transaction')}
         onAction={onAdd}
       />
     )
@@ -38,11 +40,11 @@ export default function TransactionList({
         <table className="min-w-full text-left text-sm">
           <thead className="border-b border-slate-200 text-slate-500 dark:border-slate-700">
             <tr>
-              <th className="px-4 py-3 font-medium">Title</th>
-              <th className="px-4 py-3 font-medium">Category</th>
-              <th className="px-4 py-3 font-medium">Source</th>
-              <th className="px-4 py-3 font-medium">Date</th>
-              <th className="px-4 py-3 font-medium">Amount</th>
+              <th className="px-4 py-3 font-medium">{t('Title')}</th>
+              <th className="px-4 py-3 font-medium">{t('Category')}</th>
+              <th className="px-4 py-3 font-medium">{t('Source')}</th>
+              <th className="px-4 py-3 font-medium">{t('Date')}</th>
+              <th className="px-4 py-3 font-medium">{t('Amount')}</th>
               <th className="px-4 py-3 font-medium"> </th>
             </tr>
           </thead>
@@ -53,7 +55,7 @@ export default function TransactionList({
                   <p className="font-medium">{transaction.title}</p>
                   <p className="text-xs text-slate-500">{transaction.description}</p>
                 </td>
-                <td className="px-4 py-3">{transaction.category}</td>
+                <td className="px-4 py-3">{t(transaction.category)}</td>
                 <td className="px-4 py-3">{transaction.paymentSource}</td>
                 <td className="px-4 py-3">{formatDate(transaction.date)}</td>
                 <td className="px-4 py-3 font-medium">
@@ -65,12 +67,12 @@ export default function TransactionList({
                     <div className="flex justify-end gap-3">
                       {onEdit ? (
                         <button type="button" className="text-indigo-600" onClick={() => onEdit(transaction)}>
-                          Edit
+                          {t('Edit')}
                         </button>
                       ) : null}
                       {onDelete ? (
                         <button type="button" className="text-red-600" onClick={() => onDelete(transaction)}>
-                          Delete
+                          {t('Delete')}
                         </button>
                       ) : null}
                     </div>

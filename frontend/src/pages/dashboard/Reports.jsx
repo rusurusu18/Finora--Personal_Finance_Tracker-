@@ -6,8 +6,11 @@ import Select from '../../components/ui/Select'
 import SectionCard from '../../components/sections/SectionCard'
 import { REPORT_PERIODS } from '../../utils/constants'
 import { downloadCsv, formatCurrency, formatDate } from '../../utils/helpers'
+import { FiDownload, FiPrinter } from 'react-icons/fi'
+import { useLanguage } from '../../contexts/useLanguage'
 
 export default function Reports() {
+  const { t } = useLanguage()
   const { transactions, settings } = useFinance()
   const { push } = useToast()
   const [period, setPeriod] = useState('monthly')
@@ -38,43 +41,45 @@ export default function Reports() {
         item.amount,
       ]),
     ])
-    push('CSV downloaded.', 'success')
+    push(t('CSV downloaded.'), 'success')
   }
 
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Reports</h1>
-          <p className="text-sm text-slate-500">Reports use your saved transactions.</p>
+          <h1 className="text-2xl font-semibold tracking-tight">{t('Reports')}</h1>
+          <p className="text-sm text-slate-500">{t('Reports use your saved transactions.')}</p>
         </div>
         <div className="flex gap-2">
           <Button variant="secondary" className="no-print" onClick={exportCsv}>
-            Export CSV
+            <FiDownload aria-hidden="true" />
+            {t('Export CSV')}
           </Button>
           <Button className="no-print" onClick={() => window.print()}>
-            Print report
+            <FiPrinter aria-hidden="true" />
+            {t('Print report')}
           </Button>
         </div>
       </div>
 
-      <Select id="period" label="Report type" value={period} onChange={(event) => setPeriod(event.target.value)}>
+      <Select id="period" label={t('Report type')} value={period} onChange={(event) => setPeriod(event.target.value)}>
         {REPORT_PERIODS.map((item) => (
           <option key={item.value} value={item.value}>
-            {item.label}
+            {t(item.label)}
           </option>
         ))}
       </Select>
 
-      <SectionCard title="Summary" description={`Net movement ${formatCurrency(total, currency)}`}>
+      <SectionCard title={t('Summary')} description={`${t('Net movement')} ${formatCurrency(total, currency)}`}>
         <div className="overflow-x-auto">
           <table className="min-w-full text-left text-sm">
             <thead>
               <tr className="text-slate-500">
-                <th className="py-2 font-medium">Title</th>
-                <th className="py-2 font-medium">Category</th>
-                <th className="py-2 font-medium">Date</th>
-                <th className="py-2 font-medium">Amount</th>
+                <th className="py-2 font-medium">{t('Title')}</th>
+                <th className="py-2 font-medium">{t('Category')}</th>
+                <th className="py-2 font-medium">{t('Date')}</th>
+                <th className="py-2 font-medium">{t('Amount')}</th>
               </tr>
             </thead>
             <tbody>

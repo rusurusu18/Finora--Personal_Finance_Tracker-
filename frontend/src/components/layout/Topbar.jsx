@@ -16,7 +16,7 @@ export default function Topbar({ onMenu }) {
         <button
           type="button"
           className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 md:hidden dark:border-slate-700"
-          aria-label="Open navigation"
+          aria-label={t('Open navigation')}
           onClick={onMenu}
         >
           <Menu className="h-5 w-5" />
@@ -31,8 +31,8 @@ export default function Topbar({ onMenu }) {
           type="button"
           onClick={() => setTheme(resolved === 'dark' ? 'light' : 'dark')}
           className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 dark:border-slate-700"
-          aria-label={resolved === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
-          title={resolved === 'dark' ? 'Light mode' : 'Dark mode'}
+          aria-label={t(resolved === 'dark' ? 'Switch to light mode' : 'Switch to dark mode')}
+          title={t(resolved === 'dark' ? 'Light mode' : 'Dark mode')}
         >
           {resolved === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
         </button>
@@ -40,14 +40,14 @@ export default function Topbar({ onMenu }) {
           type="button"
           onClick={toggleLanguage}
           className="h-10 rounded-xl border border-slate-200 px-3 text-sm font-medium dark:border-slate-700"
-          aria-label={language === 'en' ? 'Switch language to Nepali' : 'Switch language to English'}
+          aria-label={t(language === 'en' ? 'Switch language to Nepali' : 'Switch language to English')}
         >
           {language === 'en' ? 'नेपाली' : 'English'}
         </button>
         <Link
           to="/dashboard/notifications"
           className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 dark:border-slate-700"
-          aria-label="Notifications"
+          aria-label={t('Notifications')}
         >
           <Bell className="h-4 w-4" />
         </Link>

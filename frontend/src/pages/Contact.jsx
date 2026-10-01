@@ -11,8 +11,10 @@ import {
   FiSend,
   FiCheckCircle,
 } from 'react-icons/fi'
+import { useLanguage } from '../contexts/useLanguage'
 
 export default function Contact() {
+  const { t } = useLanguage()
   const [form, setForm] = useState({ name: '', email: '', message: '' })
   const [errors, setErrors] = useState({})
   const [sent, setSent] = useState(false)
@@ -28,9 +30,9 @@ export default function Contact() {
     event.preventDefault()
 
     const nextErrors = {
-      name: isName(form.name, 'Name'),
-      email: isEmail(form.email),
-      message: isRequired(form.message, 'Message'),
+      name: t(isName(form.name, 'Name')),
+      email: t(isEmail(form.email)),
+      message: t(isRequired(form.message, 'Message')),
     }
 
     setErrors(nextErrors)
@@ -52,12 +54,11 @@ export default function Contact() {
         </div>
 
         <h1 className="mt-5 text-3xl font-semibold tracking-tight">
-          Get in touch
+          {t('Get in touch')}
         </h1>
 
         <p className="mx-auto mt-3 max-w-xl text-slate-600 dark:text-slate-300">
-          Have a question, suggestion, or feedback? Send us a message and
-          we'll get back to you soon.
+          {t("Have a question, suggestion, or feedback? Send us a message and we'll get back to you soon.")}
         </p>
       </div>
 
@@ -68,7 +69,7 @@ export default function Contact() {
           <div>
             <div className="mb-1.5 flex items-center gap-2">
               <FiUser className="h-4 w-4 text-slate-500" />
-              <span className="text-sm font-medium">Name</span>
+              <span className="text-sm font-medium">{t('Name')}</span>
             </div>
 
             <Input
@@ -85,7 +86,7 @@ export default function Contact() {
           <div>
             <div className="mb-1.5 flex items-center gap-2">
               <FiAtSign className="h-4 w-4 text-slate-500" />
-              <span className="text-sm font-medium">Email</span>
+              <span className="text-sm font-medium">{t('Email')}</span>
             </div>
 
             <Input
@@ -103,7 +104,7 @@ export default function Contact() {
           <label className="block" htmlFor="message">
             <span className="mb-1.5 flex items-center gap-2 text-sm font-medium">
               <FiMessageSquare className="h-4 w-4 text-slate-500" />
-              Message
+              {t('Message')}
             </span>
 
             <textarea
@@ -112,7 +113,7 @@ export default function Contact() {
               rows={6}
               value={form.message}
               onChange={update}
-              placeholder="Tell us how we can help..."
+              placeholder={t('Tell us how we can help...')}
               className="w-full resize-none rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-slate-600 dark:bg-slate-900 dark:focus:border-blue-400"
             />
 
@@ -129,7 +130,7 @@ export default function Contact() {
             className="flex w-full items-center justify-center gap-2"
           >
             <FiSend className="h-4 w-4" />
-            Send message
+            {t('Send message')}
           </Button>
         </form>
 
@@ -143,10 +144,10 @@ export default function Contact() {
 
             <div>
               <p className="text-sm font-medium">
-                Message sent successfully
+                {t('Message sent successfully')}
               </p>
               <p className="mt-1 text-sm">
-                Thank you for contacting us. We'll get back to you soon.
+                {t("Thank you for contacting us. We'll get back to you soon.")}
               </p>
             </div>
           </div>

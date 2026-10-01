@@ -1,10 +1,13 @@
 import Card from '../ui/Card'
 import { formatCurrency } from '../../utils/helpers'
 
-export default function StatCard({ label, value, hint, currency, isCurrency = true }) {
+export default function StatCard({ label, value, hint, currency, isCurrency = true, icon: Icon }) {
   return (
     <Card className="p-5">
-      <p className="text-sm text-slate-500">{label}</p>
+      <div className="flex items-center justify-between gap-3">
+        <p className="text-sm text-slate-500">{label}</p>
+        {Icon ? <Icon className="h-4 w-4 shrink-0 text-slate-400" aria-hidden="true" /> : null}
+      </div>
       <p className="mt-2 text-2xl font-semibold tracking-tight">
         {isCurrency ? formatCurrency(value, currency) : value}
       </p>

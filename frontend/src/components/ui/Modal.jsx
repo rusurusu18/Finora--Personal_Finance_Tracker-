@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { X } from 'lucide-react'
 import Button from './Button'
+import { useLanguage } from '../../contexts/useLanguage'
 
 export default function Modal({
   open,
@@ -9,6 +10,7 @@ export default function Modal({
   onClose,
   footer,
 }) {
+  const { t } = useLanguage()
   useEffect(() => {
     if (!open) return undefined
     const onKey = (event) => {
@@ -28,7 +30,7 @@ export default function Modal({
     <div className="fixed inset-0 z-50 flex items-end justify-center p-4 sm:items-center">
       <button
         type="button"
-        aria-label="Close dialog overlay"
+          aria-label={t('Close dialog overlay')}
         className="absolute inset-0 bg-slate-900/50"
         onClick={onClose}
       />
@@ -42,7 +44,7 @@ export default function Modal({
           <h2 id="modal-title" className="text-lg font-semibold text-slate-900 dark:text-white">
             {title}
           </h2>
-          <Button variant="ghost" size="sm" onClick={onClose} aria-label="Close">
+          <Button variant="ghost" size="sm" onClick={onClose} aria-label={t('Close')}>
             <X className="h-4 w-4" />
           </Button>
         </div>

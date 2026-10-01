@@ -4,8 +4,11 @@ import BarChart from '../../components/sections/BarChart'
 import DonutChart from '../../components/sections/DonutChart'
 import SectionCard from '../../components/sections/SectionCard'
 import { getCategorySpending, getMonthlyTrend, getSourceSpending } from '../../utils/dashboardData'
+import { FiActivity, FiBarChart2, FiCreditCard, FiPieChart } from 'react-icons/fi'
+import { useLanguage } from '../../contexts/useLanguage'
 
 export default function Analytics() {
+  const { t } = useLanguage()
   const { transactions, settings } = useFinance()
   const currency = settings.currency
   const trend = getMonthlyTrend(transactions)
@@ -16,21 +19,21 @@ export default function Analytics() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-semibold tracking-tight">Analytics</h1>
-        <p className="text-sm text-slate-500">Charts summarize your recorded financial activity.</p>
+        <h1 className="text-2xl font-semibold tracking-tight">{t('Analytics')}</h1>
+        <p className="text-sm text-slate-500">{t('Charts summarize your recorded financial activity.')}</p>
       </div>
 
       <div className="grid gap-4 lg:grid-cols-2">
-        <SectionCard title="Income vs expense">
+        <SectionCard icon={FiActivity} title={t('Income vs expense')}>
           <AreaChart data={trend} currency={currency} />
         </SectionCard>
-        <SectionCard title="Savings trend">
+        <SectionCard icon={FiBarChart2} title={t('Savings trend')}>
           <BarChart data={savingsTrend} currency={currency} />
         </SectionCard>
-        <SectionCard title="Category spending">
+        <SectionCard icon={FiPieChart} title={t('Category spending')}>
           <DonutChart data={categories} currency={currency} />
         </SectionCard>
-        <SectionCard title="Payment-source spending">
+        <SectionCard icon={FiCreditCard} title={t('Payment-source spending')}>
           <BarChart data={sources} currency={currency} />
         </SectionCard>
       </div>

@@ -1,13 +1,15 @@
 import AccountCard from './AccountCard'
 import EmptyState from '../ui/EmptyState'
+import { useLanguage } from '../../contexts/useLanguage'
 
 export default function AccountList({ accounts, currency, onEdit, onDelete, onAdd }) {
+  const { t } = useLanguage()
   if (!accounts.length) {
     return (
       <EmptyState
-        title="No money sources yet"
-        description="Add a bank account, wallet, or cash source to start."
-        actionLabel="Add source"
+        title={t('No money sources yet')}
+        description={t('Add a bank account, wallet, or cash source to start.')}
+        actionLabel={t('Add source')}
         onAction={onAdd}
       />
     )
