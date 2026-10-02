@@ -47,7 +47,7 @@ export default function Overview() {
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-semibold tracking-tight">
-          {t(getGreeting())} 👋
+          {t(getGreeting())} 
         </h1>
         <p className="mt-1 text-slate-500">
           {t("Here's your financial picture")}{user?.name ? `, ${user.name.split(' ')[0]}` : ''}.

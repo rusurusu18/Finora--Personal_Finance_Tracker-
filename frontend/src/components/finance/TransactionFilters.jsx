@@ -5,6 +5,8 @@ import { useLanguage } from '../../contexts/useLanguage'
 
 export default function TransactionFilters({ filters, onChange, categories }) {
   const { t } = useLanguage()
+  const uniqueCategories = [...new Map(categories.map((category) => [category.name, category])).values()]
+
   function update(key, value) {
     onChange({ ...filters, [key]: value })
   }
@@ -33,7 +35,7 @@ export default function TransactionFilters({ filters, onChange, categories }) {
         onChange={(event) => update('category', event.target.value)}
       >
         <option value="">{t('All categories')}</option>
-        {categories.map((item) => (
+        {uniqueCategories.map((item) => (
           <option key={item.id} value={item.name}>
             {t(item.name)}
           </option>

@@ -108,17 +108,22 @@ export default function Transactions() {
     const payload = {
       ...form,
       amount: Number(form.amount),
-      categoryId: categories.find((item) => item.name === form.category)?.id || null,
+      categoryId:
+        categories.find((item) => item.name === form.category && item.type === form.type)?.id || null,
     }
 
-    if (editingId) {
-      await editTransaction(editingId, payload)
-      push(t('Transaction updated.'), 'success')
-    } else {
-      await addTransaction(payload)
-      push(t('Transaction added.'), 'success')
+    try {
+      if (editingId) {
+        await editTransaction(editingId, payload)
+        push(t('Transaction updated.'), 'success')
+      } else {
+        await addTransaction(payload)
+        push(t('Transaction added.'), 'success')
+      }
+      setOpen(false)
+    } catch (error) {
+      push(error.message || t('The request could not be completed.'), 'danger')
     }
-    setOpen(false)
   }
 
   return (
@@ -174,7 +179,14 @@ export default function Transactions() {
             id="type"
             label={t('Type')}
             value={form.type}
-            onChange={(event) => setForm({ ...form, type: event.target.value })}
+            onChange={(event) => {
+              const type = event.target.value
+              const typeCategories = categories.filter((item) => item.type === type)
+              const category = typeCategories.some((item) => item.name === form.category)
+                ? form.category
+                : typeCategories[0]?.name || ''
+              setForm({ ...form, type, category })
+            }}
           >
             {TRANSACTION_TYPES.map((item) => (
               <option key={item.value} value={item.value}>
@@ -235,9 +247,13 @@ export default function Transactions() {
         confirmLabel={t('Delete')}
         onClose={() => setPendingDelete(null)}
         onConfirm={async () => {
-          await removeTransaction(pendingDelete.id)
-          setPendingDelete(null)
-          push(t('Transaction deleted.'), 'success')
+          try {
+            await removeTransaction(pendingDelete.id)
+            setPendingDelete(null)
+            push(t('Transaction deleted.'), 'success')
+          } catch (error) {
+            push(error.message || t('The request could not be completed.'), 'danger')
+          }
         }}
       />
     </div>

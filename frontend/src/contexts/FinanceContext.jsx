@@ -75,6 +75,31 @@ export function FinanceProvider({ children }) {
     }
   }, [isAuthenticated])
 
+  const refreshTransactionData = useCallback(async () => {
+    const [transactionResult, accountResult, budgetResult] = await Promise.allSettled([
+      getTransactions(),
+      getAccounts(),
+      getBudgets(),
+    ])
+
+    if (transactionResult.status === 'fulfilled') {
+      setTransactions(transactionResult.value)
+    }
+    if (accountResult.status === 'fulfilled') {
+      setAccounts(accountResult.value)
+    }
+    if (budgetResult.status === 'fulfilled') {
+      setBudgets(budgetResult.value)
+    }
+
+    const errors = [transactionResult, accountResult, budgetResult]
+      .filter((result) => result.status === 'rejected')
+      .map((result) => result.reason)
+    if (errors.length) {
+      throw new AggregateError(errors, 'Could not refresh transaction and account data.')
+    }
+  }, [])
+
   useEffect(() => {
     if (isAuthenticated) {
       refresh()
@@ -95,18 +120,18 @@ export function FinanceProvider({ children }) {
 
   const addTransaction = useCallback(async (payload) => {
     await createTransaction(payload)
-    await refresh()
-  }, [refresh])
+    await refreshTransactionData()
+  }, [refreshTransactionData])
 
   const editTransaction = useCallback(async (id, payload) => {
     await updateTransaction(id, payload)
-    await refresh()
-  }, [refresh])
+    await refreshTransactionData()
+  }, [refreshTransactionData])
 
   const removeTransaction = useCallback(async (id) => {
     await deleteTransaction(id)
-    await refresh()
-  }, [refresh])
+    await refreshTransactionData()
+  }, [refreshTransactionData])
 
   const addAccount = useCallback(async (payload) => {
     await createAccount(payload)
