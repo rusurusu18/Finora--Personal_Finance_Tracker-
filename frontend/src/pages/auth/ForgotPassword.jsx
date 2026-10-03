@@ -4,7 +4,7 @@ import Button from '../../components/ui/Button'
 import Card from '../../components/ui/Card'
 import Input from '../../components/ui/Input'
 import { isEmail } from '../../utils/validators'
-import { apiRequest } from '../../config/services'
+import { forgotPasswordRequest } from '../../config/services'
 import { FiMail } from 'react-icons/fi'
 import { useLanguage } from '../../contexts/useLanguage'
 
@@ -27,10 +27,7 @@ export default function ForgotPassword() {
     setError('')
     setBusy(true)
     try {
-      const response = await apiRequest('/auth/forgot-password', {
-        method: 'POST',
-        body: JSON.stringify({ email }),
-      })
+      const response = await forgotPasswordRequest(email)
       setMessage(t(response.message))
       setSent(true)
     } catch (requestError) {

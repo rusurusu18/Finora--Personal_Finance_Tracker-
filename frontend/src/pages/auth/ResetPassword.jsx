@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import Button from '../../components/ui/Button'
-import { apiRequest } from '../../config/services'
+import { resetPasswordRequest } from '../../config/services'
 import { FiKey } from 'react-icons/fi'
 import { useLanguage } from '../../contexts/useLanguage'
 
@@ -79,10 +79,7 @@ export default function ResetPassword() {
     try {
       setLoading(true)
 
-      const response = await apiRequest('/auth/reset-password', {
-        method: 'POST',
-        body: JSON.stringify({ token, password: formData.password }),
-      })
+      const response = await resetPasswordRequest(token, formData.password)
 
       setMessage(t(response.message || 'Password reset successfully.'))
 

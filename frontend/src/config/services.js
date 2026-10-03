@@ -28,6 +28,27 @@ export async function apiRequest(path, options = {}) {
 const getData = async (path, options) => (await apiRequest(path, options)).data
 const json = (method, payload) => ({ method, body: JSON.stringify(payload) })
 
+function withQuery(path, params = {}) {
+  const query = new URLSearchParams()
+  Object.entries(params).forEach(([key, value]) => {
+    if (value !== undefined && value !== null && value !== '') {
+      query.set(key, String(value))
+    }
+  })
+  const search = query.toString()
+  return search ? `${path}?${search}` : path
+}
+
+function transactionQuery(filters) {
+  const { from, to, ...params } = filters
+  return {
+    ...params,
+    type: params.type ? String(params.type).toUpperCase() : undefined,
+    startDate: params.startDate || from,
+    endDate: params.endDate || to,
+  }
+}
+
 function mapAccount(account) {
   return {
     ...account,
@@ -54,17 +75,26 @@ function mapTransaction(transaction) {
   }
 }
 
-export async function getTransactions() {
+export async function getTransactions(filters = {}) {
   const transactions = []
   let page = 1
   let hasNextPage = true
+  const query = transactionQuery(filters)
   while (hasNextPage) {
-    const response = await apiRequest(`/transactions?page=${page}&limit=100`)
+    const response = await apiRequest(withQuery('/transactions', { ...query, page, limit: 100 }))
     transactions.push(...response.data.map(mapTransaction))
     hasNextPage = Boolean(response.meta?.hasNextPage)
     page += 1
   }
   return transactions
+}
+
+export async function getTransactionSummary(filters = {}) {
+  return getData(withQuery('/transactions/summary', transactionQuery(filters)))
+}
+
+export async function getTransaction(id) {
+  return mapTransaction(await getData(`/transactions/${id}`))
 }
 
 export async function createTransaction(payload) {
@@ -104,6 +134,14 @@ export async function getAccounts() {
   return response.accounts.map(mapAccount)
 }
 
+export async function getAccount(id) {
+  const account = await getData(`/accounts/${id}`)
+  return {
+    ...mapAccount(account),
+    transactions: account.transactions?.map(mapTransaction) || [],
+  }
+}
+
 export async function createAccount(payload) {
   const account = await getData('/accounts', json('POST', {
     name: payload.name,
@@ -133,6 +171,10 @@ export async function getBudgets() {
   return (await getData('/budgets')).map(mapBudget)
 }
 
+export async function getBudget(id) {
+  return mapBudget(await getData(`/budgets/${id}`))
+}
+
 export async function createBudget(payload) {
   const { startDate, endDate } = budgetDates(payload.period)
   return mapBudget(await getData('/budgets', json('POST', {
@@ -159,8 +201,13 @@ export async function deleteBudget(id) {
   return getData(`/budgets/${id}`, { method: 'DELETE' })
 }
 
-export async function getSavingsGoals() {
-  return (await getData('/goals')).map(mapGoal)
+export async function getSavingsGoals(status) {
+  const goalStatus = status ? String(status).toUpperCase() : undefined
+  return (await getData(withQuery('/goals', { status: goalStatus }))).map(mapGoal)
+}
+
+export async function getSavingsGoal(id) {
+  return mapGoal(await getData(`/goals/${id}`))
 }
 
 export async function createSavingsGoal(payload) {
@@ -171,21 +218,29 @@ export async function updateSavingsGoal(id, payload) {
   return mapGoal(await getData(`/goals/${id}`, json('PATCH', goalPayload(payload))))
 }
 
+export async function depositToSavingsGoal(id, amount) {
+  return mapGoal(await getData(`/goals/${id}/deposit`, json('POST', { amount: Number(amount) })))
+}
+
 export async function deleteSavingsGoal(id) {
   return getData(`/goals/${id}`, { method: 'DELETE' })
 }
 
-export async function getNotifications() {
-  return (await getData('/notifications')).map((notification) => ({
+export async function getNotifications(unreadOnly = false) {
+  return (await getData(withQuery('/notifications', { unread: unreadOnly ? true : undefined }))).map((notification) => ({
     ...notification,
-    read: notification.isRead,
-    body: notification.message,
+    read: notification.read ?? notification.isRead,
+    body: notification.body ?? notification.message,
   }))
 }
 
 export async function markNotificationRead(id) {
   await getData(`/notifications/${id}/read`, { method: 'PATCH' })
   return getNotifications()
+}
+
+export async function markAllNotificationsRead() {
+  return getData('/notifications/read-all', { method: 'PATCH' })
 }
 
 export async function getAnalytics() {
@@ -198,12 +253,27 @@ export async function getAnalytics() {
   return { transactions, accounts, budgets, savingsGoals }
 }
 
+export async function getDashboardSummary() {
+  const summary = await getData('/dashboard')
+  return {
+    ...summary,
+    accounts: summary.accounts.map(mapAccount),
+    recentTransactions: summary.recentTransactions.map(mapTransaction),
+    budgets: summary.budgets.map(mapBudget),
+    goals: summary.goals.map(mapGoal),
+  }
+}
+
 export async function loginRequest(credentials) {
   const response = await apiRequest('/auth/login', {
     method: 'POST',
     body: JSON.stringify(credentials),
   })
   return response.data
+}
+
+export async function getAuthProfileRequest() {
+  return getData('/auth/profile')
 }
 
 export async function registerRequest(payload) {
@@ -218,8 +288,63 @@ export async function registerRequest(payload) {
   return loginRequest({ email: payload.email, password: payload.password })
 }
 
-export async function getCategories() {
-  return (await getData('/categories')).map(mapCategory)
+export async function refreshTokenRequest(refreshToken = localStorage.getItem(STORAGE_KEYS.refreshToken)) {
+  if (!refreshToken) {
+    throw new Error('A refresh token is required.')
+  }
+  return getData('/auth/refresh-token', json('POST', { refreshToken }))
+}
+
+export async function logoutRequest() {
+  return getData('/auth/logout', { method: 'POST' })
+}
+
+export async function forgotPasswordRequest(email) {
+  return apiRequest('/auth/forgot-password', json('POST', { email }))
+}
+
+export async function resetPasswordRequest(token, password) {
+  return apiRequest('/auth/reset-password', json('POST', { token, password }))
+}
+
+export async function getCategories(type) {
+  const categoryType = type ? String(type).toUpperCase() : undefined
+  return (await getData(withQuery('/categories', { type: categoryType }))).map(mapCategory)
+}
+
+export async function getCategory(id) {
+  return mapCategory(await getData(`/categories/${id}`))
+}
+
+export async function createCategory(payload) {
+  return mapCategory(await getData('/categories', json('POST', {
+    ...payload,
+    type: payload.type.toUpperCase(),
+  })))
+}
+
+export async function updateCategory(id, payload) {
+  return mapCategory(await getData(`/categories/${id}`, json('PATCH', payload)))
+}
+
+export async function deleteCategory(id) {
+  return getData(`/categories/${id}`, { method: 'DELETE' })
+}
+
+export async function seedDefaultCategories() {
+  return getData('/categories/seed-defaults', { method: 'POST' })
+}
+
+export async function translateTextRequest(text) {
+  return getData('/translations/translate', json('POST', { text }))
+}
+
+export async function getProfileRequest() {
+  return getData('/users/me')
+}
+
+export async function deleteProfileRequest() {
+  return getData('/users/me', { method: 'DELETE' })
 }
 
 export async function updateProfileRequest(payload) {
