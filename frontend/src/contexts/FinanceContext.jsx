@@ -183,7 +183,7 @@ export function FinanceProvider({ children }) {
     setNotifications(next)
   }, [])
 
-  const totals = useMemo(() => getAccountTotals(accounts), [accounts])
+  const totals = useMemo(() => getAccountTotals(accounts, savingsGoals), [accounts, savingsGoals])
   const monthStats = useMemo(() => getMonthStats(transactions), [transactions])
   const budgetRemaining = useMemo(() => getBudgetRemaining(budgets), [budgets])
 

@@ -315,6 +315,8 @@ const nepaliTranslations = {
   'Good afternoon': 'शुभ दिउँसो',
   'Good evening': 'शुभ साँझ',
   'Total money': 'कुल रकम',
+  'Available after savings': 'बचत छुट्याएपछिको उपलब्ध रकम',
+  'Savings goal balances are excluded.': 'बचत लक्ष्यमा छुट्याइएको रकम घटाइएको छ।',
   'vs last month': 'गत महिनाको तुलनामा',
   'Switch to light mode': 'उज्यालो मोडमा बदल्नुहोस्',
   'Switch to dark mode': 'गाढा मोडमा बदल्नुहोस्',

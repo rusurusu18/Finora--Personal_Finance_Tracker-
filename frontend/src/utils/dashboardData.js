@@ -1,6 +1,6 @@
 import { formatCurrency, isCurrentMonth, monthKey, percent, sumBy } from './helpers'
 
-export function getAccountTotals(accounts) {
+export function getAccountTotals(accounts, savingsGoals = []) {
   const bank = accounts
     .filter((account) => account.type === 'bank')
     .reduce((sum, account) => sum + account.balance, 0)
@@ -10,12 +10,17 @@ export function getAccountTotals(accounts) {
   const cash = accounts
     .filter((account) => account.type === 'cash')
     .reduce((sum, account) => sum + account.balance, 0)
+  const savingsSetAside = savingsGoals.reduce(
+    (sum, goal) => sum + Number(goal.currentAmount ?? 0),
+    0,
+  )
 
   return {
     bank,
     wallets,
     cash,
-    total: bank + wallets + cash,
+    savingsSetAside,
+    total: bank + wallets + cash - savingsSetAside,
   }
 }
 

@@ -8,8 +8,9 @@ export default function FinancialSummary({ total, change, currency }) {
 
   return (
     <Card className="p-6">
-      <p className="text-sm text-slate-500">{t('Total money')}</p>
+      <p className="text-sm text-slate-500">{t('Available after savings')}</p>
       <p className="mt-2 text-4xl font-semibold tracking-tight">{formatCurrency(total, currency)}</p>
+      <p className="mt-2 text-xs text-slate-500">{t('Savings goal balances are excluded.')}</p>
       {Number.isFinite(change) ? (
         <p className={`mt-3 text-sm font-medium ${positive ? 'text-emerald-600' : 'text-red-600'}`}>
           {positive ? '+' : ''}
