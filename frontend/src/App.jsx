@@ -10,14 +10,14 @@ export default function App() {
   return (
     <ThemeProvider>
       <LanguageProvider>
-        <AuthProvider>
-          <FinanceProvider>
-            <ToastProvider>
+        <ToastProvider>
+          <AuthProvider>
+            <FinanceProvider>
               <AppRouter />
               <Chatbot />
-            </ToastProvider>
-          </FinanceProvider>
-        </AuthProvider>
+            </FinanceProvider>
+          </AuthProvider>
+        </ToastProvider>
       </LanguageProvider>
     </ThemeProvider>
   )

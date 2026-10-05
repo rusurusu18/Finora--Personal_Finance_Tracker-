@@ -7,6 +7,14 @@ import { getEsewaPlusPlan, initiateEsewaPayment } from '../config/services'
 import { FiUser, FiHome, FiArrowRight } from 'react-icons/fi'
 import { useLanguage } from '../contexts/useLanguage'
 
+function getUserFacingRequestError(error, fallbackMessage) {
+  const message = error instanceof Error ? error.message : ''
+  if (error instanceof TypeError || /failed to fetch|networkerror|load failed/i.test(message)) {
+    return fallbackMessage
+  }
+  return message || 'Something went wrong. Please try again.'
+}
+
 export default function Pricing() {
   const navigate = useNavigate()
   const { t } = useLanguage()
@@ -19,9 +27,9 @@ export default function Pricing() {
   useEffect(() => {
     getEsewaPlusPlan()
       .then(setPlan)
-      .catch((requestError) => setError(requestError.message))
+      .catch(() => setError('Pricing is temporarily unavailable. Please try again later.'))
       .finally(() => setLoading(false))
-  }, [])
+  }, [t])
 
   async function subscribe() {
     if (!isAuthenticated) {
@@ -46,7 +54,10 @@ export default function Pricing() {
       document.body.appendChild(form)
       form.submit()
     } catch (requestError) {
-      setError(requestError.message)
+      setError(getUserFacingRequestError(
+        requestError,
+        'Checkout could not be started. Please try again.',
+      ))
       setBusy(false)
     }
   }
@@ -145,7 +156,7 @@ export default function Pricing() {
           )
         })}
       </div>
-      {error ? <p className="mt-4 text-center text-sm text-red-600" role="alert">{t(error)}</p> : null}
+      {error ? <p className="mt-4 text-center text-sm text-slate-500" role="status">{t(error)}</p> : null}
       {!loading && !plan?.enabled && !error ? (
         <p className="mt-4 text-center text-sm text-slate-500">{t('Plus checkout is not configured yet.')}</p>
       ) : null}

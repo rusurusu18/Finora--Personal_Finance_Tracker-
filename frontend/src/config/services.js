@@ -1,6 +1,8 @@
 import { STORAGE_KEYS } from '../utils/constants'
+import { notifyAppError } from '../utils/appErrors'
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api/v1'
+const NETWORK_ERROR_MESSAGE = 'The service is temporarily unavailable. Please check your connection and try again.'
 
 export async function apiRequest(path, options = {}) {
   const accessToken = localStorage.getItem(STORAGE_KEYS.accessToken)
@@ -11,6 +13,12 @@ export async function apiRequest(path, options = {}) {
       ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
       ...options.headers,
     },
+  }).catch((requestError) => {
+    const message = requestError instanceof TypeError
+      ? NETWORK_ERROR_MESSAGE
+      : requestError.message || 'The request could not be completed.'
+    notifyAppError(message)
+    throw new Error(message, { cause: requestError })
   })
   const body = await response.json().catch(() => ({}))
 
@@ -19,6 +27,7 @@ export async function apiRequest(path, options = {}) {
     error.validationErrors = Array.isArray(body.errors)
       ? body.errors.map((issue) => ({ field: issue.path?.[0], message: issue.message }))
       : []
+    notifyAppError(error.message)
     throw error
   }
 

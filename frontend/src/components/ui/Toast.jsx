@@ -1,20 +1,55 @@
-import { createContext, useCallback, useContext, useMemo, useState } from 'react'
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import { cn } from '../../utils/helpers'
+import { APP_ERROR_EVENT } from '../../utils/appErrors'
+import { useLanguage } from '../../contexts/useLanguage'
 
 const ToastContext = createContext(null)
 
 export function ToastProvider({ children }) {
+  const { t } = useLanguage()
   const [toasts, setToasts] = useState([])
+  const recentToasts = useRef(new Map())
 
   const dismiss = useCallback((id) => {
     setToasts((items) => items.filter((item) => item.id !== id))
   }, [])
 
   const push = useCallback((message, tone = 'info') => {
+    const key = `${tone}:${message}`
+    const now = Date.now()
+    if (now - (recentToasts.current.get(key) || 0) < 1500) return
+    recentToasts.current.set(key, now)
+    for (const [recentKey, timestamp] of recentToasts.current) {
+      if (now - timestamp >= 1500) recentToasts.current.delete(recentKey)
+    }
+
     const id = Date.now() + Math.random()
     setToasts((items) => [...items, { id, message, tone }])
     window.setTimeout(() => dismiss(id), 3200)
   }, [dismiss])
+
+  useEffect(() => {
+    const showError = (message) => {
+      const displayMessage = typeof message === 'string' && message.trim()
+        ? message
+        : 'Something went wrong. Please try again.'
+      push(t(displayMessage), 'danger')
+    }
+    const handleAppError = (event) => showError(event.detail?.message)
+    const handleWindowError = (event) => showError(event.message)
+    const handleUnhandledRejection = (event) => {
+      showError(event.reason instanceof Error ? event.reason.message : String(event.reason || ''))
+    }
+
+    window.addEventListener(APP_ERROR_EVENT, handleAppError)
+    window.addEventListener('error', handleWindowError)
+    window.addEventListener('unhandledrejection', handleUnhandledRejection)
+    return () => {
+      window.removeEventListener(APP_ERROR_EVENT, handleAppError)
+      window.removeEventListener('error', handleWindowError)
+      window.removeEventListener('unhandledrejection', handleUnhandledRejection)
+    }
+  }, [push, t])
 
   const value = useMemo(() => ({ push, dismiss }), [push, dismiss])
 
@@ -48,7 +83,7 @@ export default function Toast({ message, tone = 'info', onDismiss }) {
 
   return (
     <div
-      role="status"
+      role={tone === 'danger' ? 'alert' : 'status'}
       className={cn(
         'pointer-events-auto rounded-xl border px-4 py-3 text-sm shadow-lg',
         tones[tone],

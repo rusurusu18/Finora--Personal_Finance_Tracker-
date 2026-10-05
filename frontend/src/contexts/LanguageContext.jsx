@@ -293,6 +293,8 @@ const nepaliTranslations = {
   'Opening eSewa...': 'eSewa खोलिँदैछ...',
   'Subscribe with eSewa': 'eSewa मार्फत सदस्यता लिनुहोस्',
   'Sign in to subscribe': 'सदस्यता लिन साइन इन गर्नुहोस्',
+  'Pricing is temporarily unavailable. Please try again later.': 'मूल्य विवरण हाल उपलब्ध छैन। कृपया पछि फेरि प्रयास गर्नुहोस्।',
+  'Checkout could not be started. Please try again.': 'भुक्तानी प्रक्रिया सुरु गर्न सकिएन। कृपया फेरि प्रयास गर्नुहोस्।',
   'Plus checkout is not configured yet.': 'प्लस भुक्तानी अझै सेटअप गरिएको छैन।',
   'Payment needs attention': 'भुक्तानीमा ध्यान दिनुहोस्',
   'Payment not completed': 'भुक्तानी पूरा भएन',
