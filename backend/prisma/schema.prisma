@@ -88,6 +88,7 @@ model User {
   notifications Notification[]
   translations  Translation[]
   payments      SubscriptionPayment[]
+  loanPlans     LoanPlan[]
   subscriptionTier String   @default("FREE")
   subscriptionExpiresAt DateTime?
 }
@@ -258,4 +259,22 @@ model SubscriptionPayment {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId, status])
+}
+
+model LoanPlan {
+  id                  String   @id @default(cuid())
+  userId              String
+  name                String
+  principal           Decimal  @db.Decimal(15, 2)
+  annualInterestRate  Decimal  @db.Decimal(7, 4)
+  termMonths          Int
+  monthlyPayment      Decimal  @db.Decimal(15, 2)
+  totalPayment        Decimal  @db.Decimal(15, 2)
+  totalInterest       Decimal  @db.Decimal(15, 2)
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
 }

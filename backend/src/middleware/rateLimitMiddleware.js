@@ -36,3 +36,11 @@ export const forgotPasswordLimiter = rateLimit({
     legacyHeaders    : false,
     handler          : rateLimitHandler
 });
+
+export const aiExpenseLimiter = rateLimit({
+    windowMs         : 15 * 60 * 1000,
+    max              : 20,
+    standardHeaders  : true,
+    legacyHeaders    : false,
+    handler          : rateLimitHandler
+});

@@ -235,6 +235,27 @@ export async function deleteSavingsGoal(id) {
   return getData(`/goals/${id}`, { method: 'DELETE' })
 }
 
+export async function getLoanPlans() {
+  return (await getData('/loans')).map(mapLoanPlan)
+}
+
+export async function createLoanPlan(payload) {
+  return mapLoanPlan(await getData('/loans', json('POST', {
+    name: payload.name,
+    principal: Number(payload.principal),
+    annualInterestRate: Number(payload.annualInterestRate),
+    termMonths: Number(payload.termMonths),
+  })))
+}
+
+export async function deleteLoanPlan(id) {
+  return getData(`/loans/${id}`, { method: 'DELETE' })
+}
+
+export async function parseExpenseRequest({ text, categories, currentDate }) {
+  return getData('/ai-expenses/parse', json('POST', { text, categories, currentDate }))
+}
+
 export async function getNotifications(unreadOnly = false) {
   return (await getData(withQuery('/notifications', { unread: unreadOnly ? true : undefined }))).map((notification) => ({
     ...notification,
@@ -385,6 +406,17 @@ function mapGoal(goal) {
     currentAmount: Number(goal.currentAmount),
     status: goal.status.toLowerCase(),
     targetDate: goal.targetDate ? new Date(goal.targetDate).toISOString().slice(0, 10) : '',
+  }
+}
+
+function mapLoanPlan(plan) {
+  return {
+    ...plan,
+    principal: Number(plan.principal),
+    annualInterestRate: Number(plan.annualInterestRate),
+    monthlyPayment: Number(plan.monthlyPayment),
+    totalPayment: Number(plan.totalPayment),
+    totalInterest: Number(plan.totalInterest),
   }
 }
 

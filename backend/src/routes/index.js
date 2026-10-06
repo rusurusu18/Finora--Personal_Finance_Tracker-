@@ -11,6 +11,8 @@ import dashboardRoutes from "../module/dashboard/dashboard.routes.js";
 import notificationRoutes from "../module/notification/notification.routes.js";
 import paymentRoutes from "../module/payment/payment.routes.js";
 import translationRoutes from "../module/translation/translation.routes.js";
+import loanRoutes from "../module/loan/loan.routes.js";
+import aiExpenseRoutes from "../module/aiExpense/aiExpense.routes.js";
 
 const router = express.Router();
 
@@ -25,5 +27,7 @@ router.use("/dashboard", dashboardRoutes);
 router.use("/notifications", notificationRoutes);
 router.use("/payments", paymentRoutes);
 router.use("/translations", translationRoutes);
+router.use("/loans", loanRoutes);
+router.use("/ai-expenses", aiExpenseRoutes);
 
 export default router;

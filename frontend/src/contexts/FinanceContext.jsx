@@ -3,16 +3,19 @@ import { useAuth } from './AuthContext'
 import {
   createAccount,
   createBudget,
+  createLoanPlan,
   createSavingsGoal,
   createTransaction,
   deleteAccount,
   deleteBudget,
+  deleteLoanPlan,
   deleteSavingsGoal,
   deleteTransaction,
   getAccounts,
   getBudgets,
   getCategories,
   getNotifications,
+  getLoanPlans,
   getSavingsGoals,
   getTransactions,
   markNotificationRead,
@@ -42,6 +45,7 @@ export function FinanceProvider({ children }) {
   const [accounts, setAccounts] = useState([])
   const [budgets, setBudgets] = useState([])
   const [savingsGoals, setSavingsGoals] = useState([])
+  const [loanPlans, setLoanPlans] = useState([])
   const [notifications, setNotifications] = useState([])
   const [settings, setSettings] = useState(() => {
     try {
@@ -56,19 +60,21 @@ export function FinanceProvider({ children }) {
     if (!isAuthenticated) return
     setLoading(true)
     try {
-      const [nextTransactions, nextAccounts, nextBudgets, nextGoals, nextNotifications, nextCategories] = await Promise.all([
+      const [nextTransactions, nextAccounts, nextBudgets, nextGoals, nextNotifications, nextCategories, nextLoanPlans] = await Promise.all([
         getTransactions(),
         getAccounts(),
         getBudgets(),
         getSavingsGoals(),
         getNotifications(),
         getCategories(),
+        getLoanPlans(),
       ])
       setTransactions(nextTransactions)
       setCategories(nextCategories)
       setAccounts(nextAccounts)
       setBudgets(nextBudgets)
       setSavingsGoals(nextGoals)
+      setLoanPlans(nextLoanPlans)
       setNotifications(nextNotifications)
     } finally {
       setLoading(false)
@@ -109,6 +115,7 @@ export function FinanceProvider({ children }) {
       setAccounts([])
       setBudgets([])
       setSavingsGoals([])
+      setLoanPlans([])
       setNotifications([])
       setLoading(false)
     }
@@ -178,6 +185,20 @@ export function FinanceProvider({ children }) {
     await refresh()
   }, [refresh])
 
+  const refreshLoanPlans = useCallback(async () => {
+    setLoanPlans(await getLoanPlans())
+  }, [])
+
+  const addLoanPlan = useCallback(async (payload) => {
+    await createLoanPlan(payload)
+    await refreshLoanPlans()
+  }, [refreshLoanPlans])
+
+  const removeLoanPlan = useCallback(async (id) => {
+    await deleteLoanPlan(id)
+    await refreshLoanPlans()
+  }, [refreshLoanPlans])
+
   const readNotification = useCallback(async (id) => {
     const next = await markNotificationRead(id)
     setNotifications(next)
@@ -195,6 +216,7 @@ export function FinanceProvider({ children }) {
       accounts,
       budgets,
       savingsGoals,
+      loanPlans,
       notifications,
       settings,
       setSettings,
@@ -213,6 +235,8 @@ export function FinanceProvider({ children }) {
       addGoal,
       editGoal,
       removeGoal,
+      addLoanPlan,
+      removeLoanPlan,
       readNotification,
       refresh,
     }),
@@ -223,6 +247,7 @@ export function FinanceProvider({ children }) {
       accounts,
       budgets,
       savingsGoals,
+      loanPlans,
       notifications,
       settings,
       totals,
@@ -240,6 +265,8 @@ export function FinanceProvider({ children }) {
       addGoal,
       editGoal,
       removeGoal,
+      addLoanPlan,
+      removeLoanPlan,
       readNotification,
       refresh,
     ],

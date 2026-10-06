@@ -1,3 +1,5 @@
+import { adToBs, bsToAd } from '@sbmdkl/nepali-date-converter'
+
 export function cn(...classes) {
   return classes.filter(Boolean).join(' ')
 }
@@ -15,15 +17,41 @@ export function formatCompact(amount, currency = 'NPR') {
   return formatCurrency(amount, currency)
 }
 
-export function formatDate(value) {
+export function formatDate(value, calendar = 'AD') {
   if (!value) return '—'
   const date = new Date(`${value}T00:00:00`)
   if (Number.isNaN(date.getTime())) return value
+  if (calendar === 'BS') {
+    try {
+      return `${adToBs(value)} BS`
+    } catch {
+      return `${value} (AD; BS unavailable)`
+    }
+  }
   return date.toLocaleDateString('en-GB', {
     day: 'numeric',
     month: 'short',
     year: 'numeric',
   })
+}
+
+export function convertDateToGregorian(value, calendar = 'AD') {
+  if (calendar !== 'BS') return value
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+    throw new Error('Enter a valid Bikram Sambat date in YYYY-MM-DD format.')
+  }
+  return bsToAd(value)
+}
+
+export function convertDateToBikramSambat(value) {
+  return adToBs(value)
+}
+
+export function localDateISO(date = new Date()) {
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const day = String(date.getDate()).padStart(2, '0')
+  return `${year}-${month}-${day}`
 }
 
 export function percent(part, total) {

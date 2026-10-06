@@ -28,6 +28,7 @@ import SavingsGoals from '../pages/dashboard/SavingsGoals'
 import Settings from '../pages/dashboard/Settings'
 import Transactions from '../pages/dashboard/Transactions'
 import Profile from '../pages/dashboard/Profile'
+import LoanCalculator from '../pages/dashboard/LoanCalculator'
 
 
 // ==========================================
@@ -160,6 +161,11 @@ export default function AppRouter() {
         <Route
           path="accounts"
           element={<Accounts />}
+        />
+
+        <Route
+          path="loans"
+          element={<LoanCalculator />}
         />
 
         {/* /dashboard/savings */}
