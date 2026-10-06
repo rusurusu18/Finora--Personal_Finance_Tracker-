@@ -1,9 +1,59 @@
+import { useState } from 'react'
 import Input from '../ui/Input'
 import Select from '../ui/Select'
 import { TRANSACTION_TYPES } from '../../utils/constants'
 import { useLanguage } from '../../contexts/useLanguage'
+import { convertDateToBikramSambat, convertDateToGregorian } from '../../utils/helpers'
 
-export default function TransactionFilters({ filters, onChange, categories }) {
+function CalendarFilter({ id, label, value, calendar, onChange }) {
+  const { t } = useLanguage()
+  const source = `${calendar}:${value}`
+  const formattedValue = calendar === 'BS' && value
+    ? convertDateToBikramSambat(value)
+    : value
+  const [input, setInput] = useState({ source, value: formattedValue, error: '' })
+
+  if (input.source !== source) {
+    setInput({ source, value: formattedValue, error: '' })
+  }
+
+  function handleChange(event) {
+    const nextValue = event.target.value
+    setInput({ source, value: nextValue, error: '' })
+    if (!nextValue) {
+      onChange('')
+      return
+    }
+
+    let convertedValue
+    try {
+      convertedValue = convertDateToGregorian(nextValue, calendar)
+    } catch {
+      setInput({
+        source,
+        value: nextValue,
+        error: t('Enter a valid Bikram Sambat date in YYYY-MM-DD format.'),
+      })
+      return
+    }
+    onChange(convertedValue)
+  }
+
+  return (
+    <Input
+      id={id}
+      label={calendar === 'BS' ? `${label} (BS YYYY-MM-DD)` : label}
+      type={calendar === 'BS' ? 'text' : 'date'}
+      placeholder={calendar === 'BS' ? 'YYYY-MM-DD' : undefined}
+      inputMode={calendar === 'BS' ? 'numeric' : undefined}
+      value={input.value}
+      error={input.error}
+      onChange={handleChange}
+    />
+  )
+}
+
+export default function TransactionFilters({ filters, onChange, categories, calendar = 'AD' }) {
   const { t } = useLanguage()
   const uniqueCategories = [...new Map(categories.map((category) => [category.name, category])).values()]
 
@@ -47,19 +97,19 @@ export default function TransactionFilters({ filters, onChange, categories }) {
         <option value="amount-desc">{t('Amount high to low')}</option>
         <option value="amount-asc">{t('Amount low to high')}</option>
       </Select>
-      <Input
+      <CalendarFilter
         id="from"
         label={t('From')}
-        type="date"
         value={filters.from}
-        onChange={(event) => update('from', event.target.value)}
+        calendar={calendar}
+        onChange={(value) => update('from', value)}
       />
-      <Input
+      <CalendarFilter
         id="to"
         label={t('To')}
-        type="date"
         value={filters.to}
-        onChange={(event) => update('to', event.target.value)}
+        calendar={calendar}
+        onChange={(value) => update('to', value)}
       />
     </div>
   )

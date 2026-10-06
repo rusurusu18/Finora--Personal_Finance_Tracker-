@@ -8,6 +8,7 @@ import Input from '../../components/ui/Input'
 import Modal from '../../components/ui/Modal'
 import { FiPlus } from 'react-icons/fi'
 import { useLanguage } from '../../contexts/useLanguage'
+import { convertDateToBikramSambat, convertDateToGregorian } from '../../utils/helpers'
 
 const defaultTargetDate = () =>
   new Date(Date.UTC(new Date().getUTCFullYear() + 1, 11, 31)).toISOString().slice(0, 10)
@@ -28,7 +29,13 @@ export default function SavingsGoals() {
 
   function openCreate() {
     setEditing(null)
-    setForm({ name: '', targetAmount: '', currentAmount: '0', targetDate: defaultTargetDate() })
+    const targetDate = defaultTargetDate()
+    setForm({
+      name: '',
+      targetAmount: '',
+      currentAmount: '0',
+      targetDate: settings.calendar === 'BS' ? convertDateToBikramSambat(targetDate) : targetDate,
+    })
     setOpen(true)
   }
 
@@ -38,16 +45,27 @@ export default function SavingsGoals() {
       name: goal.name,
       targetAmount: goal.targetAmount,
       currentAmount: goal.currentAmount,
-      targetDate: goal.targetDate,
+      targetDate: settings.calendar === 'BS' && goal.targetDate
+        ? convertDateToBikramSambat(goal.targetDate)
+        : goal.targetDate,
     })
     setOpen(true)
   }
 
   async function save() {
+    let targetDate
+    try {
+      targetDate = convertDateToGregorian(form.targetDate, settings.calendar)
+    } catch (error) {
+      push(t(error.message), 'danger')
+      return
+    }
+
     const payload = {
       ...form,
       targetAmount: Number(form.targetAmount),
       currentAmount: Number(form.currentAmount),
+      targetDate,
     }
     if (editing) {
       await editGoal(editing.id, payload)
@@ -75,6 +93,7 @@ export default function SavingsGoals() {
             key={goal.id}
             goal={goal}
             currency={settings.currency}
+            calendar={settings.calendar}
             onEdit={openEdit}
             onDelete={setPending}
           />
@@ -117,8 +136,9 @@ export default function SavingsGoals() {
           />
           <Input
             id="goal-date"
-            label={t('Target date')}
-            type="date"
+            label={settings.calendar === 'BS' ? `${t('Target date')} (BS YYYY-MM-DD)` : t('Target date')}
+            type={settings.calendar === 'BS' ? 'text' : 'date'}
+            placeholder={settings.calendar === 'BS' ? 'YYYY-MM-DD' : undefined}
             value={form.targetDate}
             onChange={(event) => setForm({ ...form, targetDate: event.target.value })}
           />

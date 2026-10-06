@@ -87,7 +87,7 @@ export default function Reports() {
                 <tr key={item.id} className="border-t border-slate-100 dark:border-slate-700">
                   <td className="py-2">{item.title}</td>
                   <td className="py-2">{item.category}</td>
-                  <td className="py-2">{formatDate(item.date)}</td>
+                  <td className="py-2">{formatDate(item.date, settings.calendar)}</td>
                   <td className="py-2">{formatCurrency(item.amount, currency)}</td>
                 </tr>
               ))}

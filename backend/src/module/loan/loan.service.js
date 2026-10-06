@@ -10,12 +10,12 @@ export const calculateLoan = ({ principal, annualInterestRate, termMonths }) => 
         : principal * monthlyRate * (1 + monthlyRate) ** termMonths
             / ((1 + monthlyRate) ** termMonths - 1);
     const roundedPayment = roundCurrency(monthlyPayment);
-    const totalPayment = roundCurrency(roundedPayment * termMonths);
+    const totalPayment = roundCurrency(monthlyPayment * termMonths);
 
     return {
         monthlyPayment: roundedPayment,
         totalPayment,
-        totalInterest: roundCurrency(totalPayment - principal)
+        totalInterest: roundCurrency(Math.max(0, totalPayment - principal))
     };
 };
 

@@ -2,7 +2,7 @@ import Badge from '../ui/Badge'
 import { formatCurrency, formatDate } from '../../utils/helpers'
 import { useLanguage } from '../../contexts/useLanguage'
 
-export default function TransactionCard({ transaction, currency, onEdit, onDelete }) {
+export default function TransactionCard({ transaction, currency, calendar = 'AD', onEdit, onDelete }) {
   const { t } = useLanguage()
   const isIncome = transaction.type === 'income'
 
@@ -11,7 +11,7 @@ export default function TransactionCard({ transaction, currency, onEdit, onDelet
       <div className="flex items-start justify-between gap-3">
         <div>
           <h3 className="font-medium">{transaction.title}</h3>
-          <p className="text-sm text-slate-500">{formatDate(transaction.date)}</p>
+          <p className="text-sm text-slate-500">{formatDate(transaction.date, calendar)}</p>
         </div>
         <p className={isIncome ? 'font-semibold text-emerald-600' : 'font-semibold text-slate-900 dark:text-white'}>
           {isIncome ? '+' : '-'}

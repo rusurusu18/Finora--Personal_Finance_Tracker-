@@ -2,11 +2,13 @@ import Card from '../ui/Card'
 import { useLanguage } from '../../contexts/useLanguage'
 import {
   FiBarChart2,
+  FiCalendar,
   FiCreditCard,
   FiDollarSign,
   FiPieChart,
   FiTarget,
   FiTrendingUp,
+  FiZap,
 } from 'react-icons/fi'
 
 const features = [
@@ -45,6 +47,24 @@ const features = [
     body: 'Plain-language notes such as food spend rising or a goal staying on track.',
     icon: FiTrendingUp,
     color: 'text-cyan-700 bg-cyan-50 dark:bg-cyan-950 dark:text-cyan-300',
+  },
+  {
+    title: 'English and Nepali with BS calendar',
+    body: 'Switch between English and Nepali, and view or enter dates in Bikram Sambat.',
+    icon: FiCalendar,
+    color: 'text-indigo-700 bg-indigo-50 dark:bg-indigo-950 dark:text-indigo-300',
+  },
+  {
+    title: 'AI natural-language expense entry',
+    body: 'Describe an expense in English or Nepali and review the parsed draft before saving.',
+    icon: FiZap,
+    color: 'text-fuchsia-700 bg-fuchsia-50 dark:bg-fuchsia-950 dark:text-fuchsia-300',
+  },
+  {
+    title: 'Loan & EMI Calculator',
+    body: 'Estimate monthly payments, compare total interest, and save loan plans.',
+    icon: FiTrendingUp,
+    color: 'text-orange-700 bg-orange-50 dark:bg-orange-950 dark:text-orange-300',
   },
 ]
 

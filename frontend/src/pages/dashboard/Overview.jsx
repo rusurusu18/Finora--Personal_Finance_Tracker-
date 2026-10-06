@@ -87,14 +87,14 @@ export default function Overview() {
         <SectionCard icon={FiTarget} title={t('Savings goals')}>
           <div className="grid gap-4">
             {savingsGoals.slice(0, 3).map((goal) => (
-              <SavingsGoalCard key={goal.id} goal={goal} currency={currency} />
+              <SavingsGoalCard key={goal.id} goal={goal} currency={currency} calendar={settings.calendar} />
             ))}
           </div>
         </SectionCard>
       </div>
 
       <SectionCard icon={FiList} title={t('Recent transactions')}>
-        <TransactionList transactions={transactions.slice(0, 6)} currency={currency} />
+        <TransactionList transactions={transactions.slice(0, 6)} currency={currency} calendar={settings.calendar} />
       </SectionCard>
     </div>
   )

@@ -94,6 +94,21 @@ export default function Settings() {
       </Card>
 
       <Card className="p-5">
+        <h2 className="font-semibold">{t('Calendar')}</h2>
+        <div className="mt-4">
+          <Select
+            id="calendar"
+            label={t('Calendar')}
+            value={settings.calendar || 'AD'}
+            onChange={(event) => setSettings({ ...settings, calendar: event.target.value })}
+          >
+            <option value="AD">{t('Gregorian (AD)')}</option>
+            <option value="BS">{t('Bikram Sambat (BS)')}</option>
+          </Select>
+        </div>
+      </Card>
+
+      <Card className="p-5">
         <h2 className="font-semibold">{t('Notifications')}</h2>
         <div className="mt-4 space-y-3">
           {[

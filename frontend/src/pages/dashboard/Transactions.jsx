@@ -11,15 +11,18 @@ import Modal from '../../components/ui/Modal'
 import Select from '../../components/ui/Select'
 import { TRANSACTION_TYPES } from '../../utils/constants'
 import { hasErrors, validateTransaction } from '../../utils/validators'
+import { convertDateToBikramSambat, convertDateToGregorian, localDateISO } from '../../utils/helpers'
+import { parseExpenseRequest } from '../../config/services'
 import { FiPlus } from 'react-icons/fi'
 import { useLanguage } from '../../contexts/useLanguage'
+import Card from '../../components/ui/Card'
 
-const emptyForm = () => ({
+const emptyForm = (calendar = 'AD') => ({
   title: '',
   amount: '',
   type: 'expense',
   category: '',
-  date: new Date().toISOString().slice(0, 10),
+  date: calendar === 'BS' ? convertDateToBikramSambat(localDateISO()) : localDateISO(),
   paymentSource: '',
   accountId: '',
   description: '',
@@ -44,6 +47,8 @@ export default function Transactions() {
   const [editingId, setEditingId] = useState(null)
   const [open, setOpen] = useState(false)
   const [pendingDelete, setPendingDelete] = useState(null)
+  const [naturalText, setNaturalText] = useState('')
+  const [parsing, setParsing] = useState(false)
   const search = useDebounce(filters.search)
 
   const visible = useMemo(() => {
@@ -74,7 +79,7 @@ export default function Transactions() {
   function openCreate() {
     setEditingId(null)
     setForm({
-      ...emptyForm(),
+      ...emptyForm(settings.calendar),
       category: categories.find((item) => item.type === 'expense')?.name || '',
       accountId: accounts[0]?.id || '',
       paymentSource: accounts[0]?.name || '',
@@ -90,7 +95,7 @@ export default function Transactions() {
       amount: transaction.amount,
       type: transaction.type,
       category: transaction.category,
-      date: transaction.date,
+      date: settings.calendar === 'BS' ? convertDateToBikramSambat(transaction.date) : transaction.date,
       paymentSource: transaction.paymentSource,
       accountId: transaction.accountId,
       description: transaction.description || '',
@@ -100,13 +105,24 @@ export default function Transactions() {
   }
 
   async function handleSave() {
-    const nextErrors = validateTransaction(form)
+    let gregorianDate
+    try {
+      gregorianDate = convertDateToGregorian(form.date, settings.calendar)
+    } catch (error) {
+      const nextErrors = validateTransaction(form)
+      nextErrors.date = t(error.message)
+      setErrors(nextErrors)
+      return
+    }
+
+    const nextErrors = validateTransaction({ ...form, date: gregorianDate })
     if (!form.accountId) nextErrors.accountId = 'Add a money source before creating a transaction.'
     setErrors(nextErrors)
     if (hasErrors(nextErrors)) return
 
     const payload = {
       ...form,
+      date: gregorianDate,
       amount: Number(form.amount),
       categoryId:
         categories.find((item) => item.name === form.category && item.type === form.type)?.id || null,
@@ -126,6 +142,40 @@ export default function Transactions() {
     }
   }
 
+  async function handleParseExpense() {
+    setParsing(true)
+    try {
+      const parsed = await parseExpenseRequest({
+        text: naturalText,
+        categories: categories.filter((item) => item.type === 'expense').map((item) => item.name),
+        currentDate: localDateISO(),
+      })
+      const category = categories.find(
+        (item) => item.type === 'expense' && item.name === parsed.category,
+      ) || categories.find((item) => item.type === 'expense')
+      const account = accounts[0]
+      setEditingId(null)
+      setForm({
+        ...emptyForm(settings.calendar),
+        title: parsed.description,
+        amount: String(parsed.amount),
+        type: 'expense',
+        category: category?.name || '',
+        date: settings.calendar === 'BS'
+          ? convertDateToBikramSambat(parsed.date)
+          : parsed.date,
+        accountId: account?.id || '',
+        paymentSource: account?.name || '',
+      })
+      setErrors({})
+      setOpen(true)
+    } catch (error) {
+      push(error.message || t('The request could not be completed.'), 'danger')
+    } finally {
+      setParsing(false)
+    }
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -136,11 +186,39 @@ export default function Transactions() {
         <Button onClick={openCreate}><FiPlus aria-hidden="true" />{t('Add transaction')}</Button>
       </div>
 
-      <TransactionFilters filters={filters} categories={categories} onChange={setFilters} />
+      <Card className="p-5">
+        <div className="mb-3">
+          <h2 className="font-semibold">{t('Describe your expense')}</h2>
+          <p className="mt-1 text-sm text-slate-500">{t('Write naturally in English or Nepali, e.g. “lunch 450 rupees yesterday”.')}</p>
+        </div>
+        <textarea
+          value={naturalText}
+          onChange={(event) => setNaturalText(event.target.value)}
+          maxLength={500}
+          rows={2}
+          aria-label={t('Describe your expense')}
+          placeholder={t('Write naturally in English or Nepali, e.g. “lunch 450 rupees yesterday”.')}
+          className="w-full rounded-xl border border-slate-200 bg-white p-3 text-sm text-slate-900 placeholder:text-slate-400 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100"
+        />
+        <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
+          <p className="max-w-2xl text-xs text-slate-500">{t('Your text is sent to Google Gemini for parsing. Review the draft before saving it.')}</p>
+          <Button onClick={handleParseExpense} disabled={parsing || naturalText.trim().length < 3}>
+            {parsing ? t('Parsing…') : t('Parse with Gemini')}
+          </Button>
+        </div>
+      </Card>
+
+      <TransactionFilters
+        filters={filters}
+        categories={categories}
+        calendar={settings.calendar}
+        onChange={setFilters}
+      />
 
       <TransactionList
         transactions={visible}
         currency={settings.currency}
+        calendar={settings.calendar}
         onEdit={openEdit}
         onDelete={setPendingDelete}
         onAdd={openCreate}
@@ -225,8 +303,10 @@ export default function Transactions() {
           </Select>
           <Input
             id="date"
-            label={t('Date')}
-            type="date"
+            label={settings.calendar === 'BS' ? `${t('Date')} (BS YYYY-MM-DD)` : t('Date')}
+            type={settings.calendar === 'BS' ? 'text' : 'date'}
+            placeholder={settings.calendar === 'BS' ? 'YYYY-MM-DD' : undefined}
+            inputMode={settings.calendar === 'BS' ? 'numeric' : undefined}
             value={form.date}
             error={errors.date}
             onChange={(event) => setForm({ ...form, date: event.target.value })}

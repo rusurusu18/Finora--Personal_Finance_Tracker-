@@ -378,6 +378,8 @@ const nepaliTranslations = {
   'Finora Guide chat': 'Finora Guide कुराकानी',
   'Loan & EMI Calculator': 'ऋण तथा EMI क्याल्कुलेटर',
   'Calculate and save loan plans.': 'ऋणको किस्ता गणना गरी योजना सुरक्षित गर्नुहोस्।',
+  'Loan plan saved.': 'ऋण योजना सुरक्षित भयो।',
+  'Loan plan deleted.': 'ऋण योजना हटाइयो।',
   'Loan name': 'ऋणको नाम',
   'Loan amount': 'ऋण रकम',
   'Annual interest rate (%)': 'वार्षिक ब्याजदर (%)',
@@ -386,6 +388,8 @@ const nepaliTranslations = {
   'Total interest': 'कुल ब्याज',
   'Total repayment': 'कुल भुक्तानी',
   'Save loan plan': 'ऋण योजना सुरक्षित गर्नुहोस्',
+  'Saving…': 'सुरक्षित हुँदैछ…',
+  months: 'महिना',
   'Saved loan plans': 'सुरक्षित ऋण योजनाहरू',
   'No saved loan plans yet.': 'अहिलेसम्म कुनै ऋण योजना सुरक्षित गरिएको छैन।',
   'Describe your expense': 'आफ्नो खर्च वर्णन गर्नुहोस्',
@@ -398,6 +402,13 @@ const nepaliTranslations = {
   'Bikram Sambat (BS)': 'विक्रम संवत् (BS)',
   'Enter a valid Bikram Sambat date in YYYY-MM-DD format.': 'विक्रम संवत्को मिति YYYY-MM-DD ढाँचामा लेख्नुहोस्।',
   'AI expense parsing is not configured': 'AI खर्च विवरण सेटअप गरिएको छैन',
+  'English and Nepali with BS calendar': 'अंग्रेजी र नेपाली तथा विक्रम संवत् पात्रो',
+  'Switch between English and Nepali, and view or enter dates in Bikram Sambat.': 'अंग्रेजी र नेपाली भाषा छान्नुहोस् र विक्रम संवत्मा मिति हेर्नुहोस् वा लेख्नुहोस्।',
+  'AI natural-language expense entry': 'AI बाट सामान्य भाषामा खर्च प्रविष्टि',
+  'Describe an expense in English or Nepali and review the parsed draft before saving.': 'अंग्रेजी वा नेपालीमा खर्च वर्णन गरी सुरक्षित गर्नुअघि तयार मस्यौदा जाँच गर्नुहोस्।',
+  'Estimate monthly payments, compare total interest, and save loan plans.': 'मासिक किस्ता र कुल ब्याजको अनुमान गरी ऋण योजना सुरक्षित गर्नुहोस्।',
+  'Delete loan plan?': 'ऋण योजना हटाउने?',
+  'This loan plan will be permanently removed.': 'यो ऋण योजना स्थायी रूपमा हटाइनेछ।',
 }
 
 export function LanguageProvider({ children }) {

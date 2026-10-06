@@ -6,6 +6,7 @@ import { useLanguage } from '../../contexts/useLanguage'
 export default function TransactionList({
   transactions,
   currency,
+  calendar = 'AD',
   onEdit,
   onDelete,
   onAdd,
@@ -30,6 +31,7 @@ export default function TransactionList({
             key={transaction.id}
             transaction={transaction}
             currency={currency}
+            calendar={calendar}
             onEdit={onEdit}
             onDelete={onDelete}
           />
@@ -57,7 +59,7 @@ export default function TransactionList({
                 </td>
                 <td className="px-4 py-3">{t(transaction.category)}</td>
                 <td className="px-4 py-3">{transaction.paymentSource}</td>
-                <td className="px-4 py-3">{formatDate(transaction.date)}</td>
+                <td className="px-4 py-3">{formatDate(transaction.date, calendar)}</td>
                 <td className="px-4 py-3 font-medium">
                   {transaction.type === 'income' ? '+' : '-'}
                   {formatCurrency(transaction.amount, currency)}

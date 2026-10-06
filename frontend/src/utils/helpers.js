@@ -36,6 +36,7 @@ export function formatDate(value, calendar = 'AD') {
 }
 
 export function convertDateToGregorian(value, calendar = 'AD') {
+  if (!value) return value
   if (calendar !== 'BS') return value
   if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) {
     throw new Error('Enter a valid Bikram Sambat date in YYYY-MM-DD format.')

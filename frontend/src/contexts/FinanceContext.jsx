@@ -31,6 +31,7 @@ export const FinanceContext = createContext(null)
 
 const defaultSettings = {
   currency: 'NPR',
+  calendar: 'AD',
   notifications: {
     email: true,
     push: false,

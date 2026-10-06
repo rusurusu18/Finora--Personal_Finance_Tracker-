@@ -3,7 +3,7 @@ import { clampPercent, formatCurrency, formatDate, percent } from '../../utils/h
 import { FiTarget } from 'react-icons/fi'
 import { useLanguage } from '../../contexts/useLanguage'
 
-export default function SavingsGoalCard({ goal, currency, onEdit, onDelete }) {
+export default function SavingsGoalCard({ goal, currency, calendar = 'AD', onEdit, onDelete }) {
   const { t } = useLanguage()
   const progress = clampPercent(percent(goal.currentAmount, goal.targetAmount))
 
@@ -15,7 +15,7 @@ export default function SavingsGoalCard({ goal, currency, onEdit, onDelete }) {
             <FiTarget className="h-4 w-4 text-slate-500" aria-hidden="true" />
             <h3 className="font-semibold">{goal.name}</h3>
           </div>
-          <p className="text-sm text-slate-500">{t('Target')} {formatDate(goal.targetDate)}</p>
+          <p className="text-sm text-slate-500">{t('Target')} {formatDate(goal.targetDate, calendar)}</p>
         </div>
         <p className="text-sm font-medium">{progress}%</p>
       </div>
