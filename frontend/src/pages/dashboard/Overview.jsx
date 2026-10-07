@@ -10,8 +10,8 @@ import AreaChart from '../../components/sections/AreaChart'
 import SpendingOverview from '../../components/sections/SpendingOverview'
 import SectionCard from '../../components/sections/SectionCard'
 import Skeleton from '../../components/ui/Skeleton'
-import { getCategorySpending, getMonthlyTrend } from '../../utils/dashboardData'
-import { getGreeting } from '../../utils/helpers'
+import { getCategorySpending, getFinancialHealthScore, getMonthlyTrend, getNetWorthSummary } from '../../utils/dashboardData'
+import { formatCurrency, getGreeting } from '../../utils/helpers'
 import { useLanguage } from '../../contexts/useLanguage'
 import {
   FiActivity,
@@ -27,11 +27,13 @@ import {
 export default function Overview() {
   const { t } = useLanguage()
   const { user } = useAuth()
-  const { loading, totals, monthStats, budgetRemaining, transactions, budgets, savingsGoals, settings } =
+  const { loading, totals, monthStats, budgetRemaining, transactions, budgets, savingsGoals, accounts, settings, loanPlans } =
     useFinance()
   const currency = settings.currency
   const trend = getMonthlyTrend(transactions)
   const categories = getCategorySpending(transactions)
+  const netWorth = getNetWorthSummary(accounts, savingsGoals, loanPlans)
+  const health = getFinancialHealthScore({ accounts, budgets, savingsGoals, loanPlans, monthStats, totals })
 
   if (loading) {
     return (
@@ -67,6 +69,30 @@ export default function Overview() {
         <StatCard label={t('Expenses')} value={monthStats.expenses} currency={currency} icon={FiArrowUpRight} />
         <StatCard label={t('Savings')} value={monthStats.savings} currency={currency} icon={FiTrendingUp} />
         <StatCard label={t('Budget remaining')} value={budgetRemaining} currency={currency} icon={FiPieChart} />
+      </div>
+
+      <div className="grid gap-4 lg:grid-cols-2">
+        <SectionCard title={t('Financial Health Score')} description={t('Your balance of savings, debt, and budget discipline.')}> 
+          <div className="flex items-center justify-between gap-4">
+            <div>
+              <p className="text-3xl font-semibold">{health.score}/100</p>
+              <p className="mt-2 text-sm text-slate-500">{t(health.label)}</p>
+            </div>
+            <div className="h-3 w-32 overflow-hidden rounded-full bg-slate-200 dark:bg-slate-700">
+              <div
+                className="h-full rounded-full bg-emerald-500 transition-all"
+                style={{ width: `${Math.min(100, health.score)}%` }}
+              />
+            </div>
+          </div>
+        </SectionCard>
+        <SectionCard title={t('Net Worth Tracker')} description={t('Current assets minus liabilities and debt.')}> 
+          <div className="space-y-2 text-sm">
+            <div className="flex justify-between"><span className="text-slate-500">{t('Assets')}</span><span className="font-medium">{formatCurrency(netWorth.total, currency)}</span></div>
+            <div className="flex justify-between"><span className="text-slate-500">{t('Debt')}</span><span className="font-medium">{formatCurrency(netWorth.debt, currency)}</span></div>
+            <div className="flex justify-between"><span className="text-slate-500">{t('Net worth')}</span><span className="font-semibold">{formatCurrency(netWorth.total, currency)}</span></div>
+          </div>
+        </SectionCard>
       </div>
 
       <div className="grid gap-4 xl:grid-cols-2">
