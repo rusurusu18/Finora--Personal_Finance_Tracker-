@@ -53,9 +53,10 @@ function CalendarFilter({ id, label, value, calendar, onChange }) {
   )
 }
 
-export default function TransactionFilters({ filters, onChange, categories, calendar = 'AD' }) {
+export default function TransactionFilters({ filters, onChange, categories, accounts = [], calendar = 'AD' }) {
   const { t } = useLanguage()
   const uniqueCategories = [...new Map(categories.map((category) => [category.name, category])).values()]
+  const paymentSources = [...new Set(accounts.map((account) => account.institution || account.provider || account.name).filter(Boolean))]
 
   function update(key, value) {
     onChange({ ...filters, [key]: value })
@@ -89,6 +90,17 @@ export default function TransactionFilters({ filters, onChange, categories, cale
           <option key={item.id} value={item.name}>
             {t(item.name)}
           </option>
+        ))}
+      </Select>
+      <Select
+        id="payment-source"
+        label={t('Payment source')}
+        value={filters.paymentSource}
+        onChange={(event) => update('paymentSource', event.target.value)}
+      >
+        <option value="">{t('All sources')}</option>
+        {paymentSources.map((source) => (
+          <option key={source} value={source}>{t(source)}</option>
         ))}
       </Select>
       <Select id="sort" label={t('Sort')} value={filters.sort} onChange={(event) => update('sort', event.target.value)}>

@@ -117,3 +117,24 @@ export const transactionQuerySchema = z.object({
     page      : z.string().regex(/^\d+$/).optional(),
     limit     : z.string().regex(/^\d+$/).optional()
 });
+
+export const createRecurringTransactionSchema = z.object({
+    accountId: z.string().min(1),
+    categoryId: z.string().nullable().optional(),
+    type: z.enum(["INCOME", "EXPENSE"]),
+    amount: z.number().positive(),
+    description: z.string().min(1).max(255),
+    paymentSource: z.string().max(100).nullable().optional(),
+    notes: z.string().max(1000).nullable().optional(),
+    frequency: z.enum(["DAILY", "WEEKLY", "MONTHLY", "YEARLY"]),
+    interval: z.number().int().min(1).max(365).default(1),
+    startDate: z.string().datetime().or(z.date()).transform((date) => new Date(date)),
+    endDate: z.string().datetime().or(z.date()).transform((date) => new Date(date)).nullable().optional()
+}).refine((data) => !data.endDate || data.endDate >= data.startDate, {
+    message: "End date must be on or after the start date",
+    path: ["endDate"]
+});
+
+export const updateRecurringTransactionSchema = z.object({
+    isActive: z.boolean()
+});

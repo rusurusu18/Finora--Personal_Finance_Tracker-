@@ -6,6 +6,7 @@ import {
   LayoutDashboard,
   Landmark,
   Receipt,
+  Repeat,
   Settings,
   Target,
   Wallet,
@@ -14,6 +15,7 @@ import {
 export const dashboardLinks = [
   { to: '/dashboard', label: 'Overview', icon: LayoutDashboard, end: true },
   { to: '/dashboard/transactions', label: 'Transactions', icon: Receipt },
+  { to: '/dashboard/recurring', label: 'Recurring transactions', icon: Repeat },
   { to: '/dashboard/budgets', label: 'Budgets', icon: Target },
   { to: '/dashboard/analytics', label: 'Analytics', icon: ChartColumn },
   { to: '/dashboard/accounts', label: 'Accounts', icon: Wallet },

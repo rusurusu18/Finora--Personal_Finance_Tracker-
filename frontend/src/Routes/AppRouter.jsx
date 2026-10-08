@@ -11,6 +11,7 @@ import Features from '../pages/Features'
 import Home from '../pages/Home'
 import Pricing from '../pages/Pricing'
 import EsewaPaymentResult from '../pages/EsewaPaymentResult'
+import KhaltiPaymentResult from '../pages/KhaltiPaymentResult'
 import NotFound from '../pages/NotFound'
 
 import ForgotPassword from '../pages/auth/ForgotPassword'
@@ -24,6 +25,7 @@ import Budgets from '../pages/dashboard/Budgets'
 import Notifications from '../pages/dashboard/Notifications'
 import Overview from '../pages/dashboard/Overview'
 import Reports from '../pages/dashboard/Reports'
+import RecurringTransactions from '../pages/dashboard/RecurringTransactions'
 import SavingsGoals from '../pages/dashboard/SavingsGoals'
 import Settings from '../pages/dashboard/Settings'
 import Transactions from '../pages/dashboard/Transactions'
@@ -87,6 +89,7 @@ export default function AppRouter() {
 
         <Route path="/pricing/esewa/success" element={<EsewaPaymentResult />} />
         <Route path="/pricing/esewa/failure" element={<EsewaPaymentResult />} />
+        <Route path="/pricing/khalti/result" element={<KhaltiPaymentResult />} />
 
       </Route>
 
@@ -143,6 +146,11 @@ export default function AppRouter() {
         <Route
           path="transactions"
           element={<Transactions />}
+        />
+
+        <Route
+          path="recurring"
+          element={<RecurringTransactions />}
         />
 
         {/* /dashboard/budgets */}

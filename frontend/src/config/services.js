@@ -58,6 +58,23 @@ function transactionQuery(filters) {
   }
 }
 
+function mapRecurringTransaction(schedule) {
+  return {
+    ...schedule,
+    type: schedule.type.toLowerCase(),
+    amount: Number(schedule.amount),
+    frequency: schedule.frequency.toLowerCase(),
+    interval: Number(schedule.interval),
+    startDate: new Date(schedule.startDate).toISOString().slice(0, 10),
+    nextRunAt: new Date(schedule.nextRunAt).toISOString().slice(0, 10),
+    endDate: schedule.endDate ? new Date(schedule.endDate).toISOString().slice(0, 10) : '',
+    lastRunAt: schedule.lastRunAt ? new Date(schedule.lastRunAt).toISOString().slice(0, 10) : '',
+    category: schedule.category?.name || '',
+    accountName: schedule.account?.name || '',
+    isActive: Boolean(schedule.isActive),
+  }
+}
+
 function mapAccount(account) {
   return {
     ...account,
@@ -136,6 +153,37 @@ export async function updateTransaction(id, payload) {
 
 export async function deleteTransaction(id) {
   return getData(`/transactions/${id}`, { method: 'DELETE' })
+}
+
+export async function getRecurringTransactions() {
+  return (await getData('/transactions/recurring')).map(mapRecurringTransaction)
+}
+
+export async function createRecurringTransaction(payload) {
+  const schedule = await getData('/transactions/recurring', json('POST', {
+    accountId: payload.accountId,
+    categoryId: payload.categoryId || null,
+    type: payload.type.toUpperCase(),
+    amount: Number(payload.amount),
+    description: payload.title,
+    paymentSource: payload.paymentSource,
+    notes: payload.notes || null,
+    frequency: payload.frequency.toUpperCase(),
+    interval: Number(payload.interval),
+    startDate: new Date(`${payload.startDate}T00:00:00.000Z`).toISOString(),
+    endDate: payload.endDate
+      ? new Date(`${payload.endDate}T00:00:00.000Z`).toISOString()
+      : null,
+  }))
+  return mapRecurringTransaction(schedule)
+}
+
+export async function updateRecurringTransaction(id, isActive) {
+  return mapRecurringTransaction(await getData(`/transactions/recurring/${id}`, json('PATCH', { isActive })))
+}
+
+export async function deleteRecurringTransaction(id) {
+  return getData(`/transactions/recurring/${id}`, { method: 'DELETE' })
 }
 
 export async function getAccounts() {
@@ -388,7 +436,7 @@ export async function changePasswordRequest(payload) {
 }
 
 export async function getEsewaPlusPlan() {
-  return getData('/payments/esewa/plus-plan')
+  return getData('/payments/plus-plan')
 }
 
 export async function initiateEsewaPayment() {
@@ -397,6 +445,14 @@ export async function initiateEsewaPayment() {
 
 export async function verifyEsewaPayment(data) {
   return getData('/payments/esewa/verify', json('POST', { data }))
+}
+
+export async function initiateKhaltiPayment() {
+  return getData('/payments/khalti/initiate', { method: 'POST' })
+}
+
+export async function verifyKhaltiPayment(pidx) {
+  return getData('/payments/khalti/verify', json('POST', { pidx }))
 }
 
 function mapGoal(goal) {

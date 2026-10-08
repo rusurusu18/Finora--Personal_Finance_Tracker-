@@ -62,6 +62,18 @@ enum PaymentStatus {
   FAILED
 }
 
+enum PaymentProvider {
+  ESEWA
+  KHALTI
+}
+
+enum RecurrenceFrequency {
+  DAILY
+  WEEKLY
+  MONTHLY
+  YEARLY
+}
+
 // ==========================================
 // USER
 // ==========================================
@@ -82,6 +94,7 @@ model User {
 
   accounts      Account[]
   transactions  Transaction[]
+  recurringTransactions RecurringTransaction[]
   categories    Category[]
   budgets       Budget[]
   savingsGoals  SavingsGoal[]
@@ -114,6 +127,7 @@ model Account {
   user           User          @relation(fields: [userId], references: [id], onDelete: Cascade)
   transactions   Transaction[] @relation("AccountTransactions")
   toTransactions Transaction[] @relation("ToAccountTransactions")
+  recurringTransactions RecurringTransaction[]
 
   @@index([userId])
 }
@@ -136,6 +150,7 @@ model Category {
 
   user         User?         @relation(fields: [userId], references: [id], onDelete: Cascade)
   transactions Transaction[]
+  recurringTransactions RecurringTransaction[]
   budgets      Budget[]
 
   @@index([userId, type])
@@ -160,15 +175,18 @@ model Transaction {
   date        DateTime
   createdAt   DateTime        @default(now())
   updatedAt   DateTime        @updatedAt
+  recurringTransactionId String?
 
   user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   account   Account   @relation("AccountTransactions", fields: [accountId], references: [id], onDelete: Cascade)
   toAccount Account?  @relation("ToAccountTransactions", fields: [toAccountId], references: [id], onDelete: SetNull)
   category  Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  recurringTransaction RecurringTransaction? @relation(fields: [recurringTransactionId], references: [id], onDelete: SetNull)
 
   @@index([userId, date])
   @@index([userId, type])
   @@index([accountId])
+  @@unique([recurringTransactionId, date])
 }
 
 
@@ -249,7 +267,9 @@ model SubscriptionPayment {
   id              String        @id @default(cuid())
   userId          String
   transactionUuid String        @unique
-  productCode     String
+  provider        PaymentProvider @default(ESEWA)
+  productCode     String?
+  pidx            String?       @unique
   amount          Decimal       @db.Decimal(15, 2)
   status          PaymentStatus @default(PENDING)
   referenceId     String?
@@ -259,6 +279,35 @@ model SubscriptionPayment {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId, status])
+}
+
+model RecurringTransaction {
+  id            String              @id @default(cuid())
+  userId        String
+  accountId     String
+  categoryId    String?
+  type          TransactionType
+  amount        Decimal             @db.Decimal(15, 2)
+  description   String
+  paymentSource String?
+  notes         String?
+  frequency     RecurrenceFrequency
+  interval      Int                 @default(1)
+  startDate     DateTime
+  nextRunAt     DateTime
+  endDate       DateTime?
+  lastRunAt     DateTime?
+  isActive      Boolean             @default(true)
+  createdAt     DateTime            @default(now())
+  updatedAt     DateTime            @updatedAt
+
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  account      Account       @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  category     Category?     @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  transactions Transaction[]
+
+  @@index([isActive, nextRunAt])
+  @@index([userId, isActive])
 }
 
 model LoanPlan {

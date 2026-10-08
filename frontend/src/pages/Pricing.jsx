@@ -3,7 +3,11 @@ import Card from '../components/ui/Card'
 import Button from '../components/ui/Button'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
-import { getEsewaPlusPlan, initiateEsewaPayment } from '../config/services'
+import {
+  getEsewaPlusPlan,
+  initiateEsewaPayment,
+  initiateKhaltiPayment,
+} from '../config/services'
 import { FiUser, FiHome, FiArrowRight } from 'react-icons/fi'
 import { useLanguage } from '../contexts/useLanguage'
 
@@ -21,7 +25,7 @@ export default function Pricing() {
   const { isAuthenticated } = useAuth()
   const [plan, setPlan] = useState(null)
   const [loading, setLoading] = useState(true)
-  const [busy, setBusy] = useState(false)
+  const [busyProvider, setBusyProvider] = useState('')
   const [error, setError] = useState('')
 
   useEffect(() => {
@@ -31,34 +35,40 @@ export default function Pricing() {
       .finally(() => setLoading(false))
   }, [t])
 
-  async function subscribe() {
+  async function subscribe(provider) {
     if (!isAuthenticated) {
       navigate('/login')
       return
     }
 
-    setBusy(true)
+    setBusyProvider(provider)
     setError('')
     try {
-      const checkout = await initiateEsewaPayment()
-      const form = document.createElement('form')
-      form.method = 'POST'
-      form.action = checkout.paymentUrl
-      Object.entries(checkout.fields).forEach(([name, value]) => {
-        const input = document.createElement('input')
-        input.type = 'hidden'
-        input.name = name
-        input.value = value
-        form.appendChild(input)
-      })
-      document.body.appendChild(form)
-      form.submit()
+      if (provider === 'esewa') {
+        const checkout = await initiateEsewaPayment()
+        const form = document.createElement('form')
+        form.method = 'POST'
+        form.action = checkout.paymentUrl
+        Object.entries(checkout.fields).forEach(([name, value]) => {
+          const input = document.createElement('input')
+          input.type = 'hidden'
+          input.name = name
+          input.value = value
+          form.appendChild(input)
+        })
+        document.body.appendChild(form)
+        form.submit()
+        return
+      }
+
+      const checkout = await initiateKhaltiPayment()
+      window.location.assign(checkout.paymentUrl)
     } catch (requestError) {
       setError(getUserFacingRequestError(
         requestError,
         'Checkout could not be started. Please try again.',
       ))
-      setBusy(false)
+      setBusyProvider('')
     }
   }
 
@@ -88,7 +98,7 @@ export default function Pricing() {
             icon: FiHome,
             iconColor: 'text-emerald-700',
             iconBg: 'bg-emerald-100 dark:bg-emerald-950',
-            points: ['All Personal features', 'Time-limited Plus access', 'eSewa-verified checkout'],
+            points: ['All Personal features', 'Time-limited Plus access', 'eSewa and Khalti verified checkout'],
           },
         ].map((item) => {
           const Icon = item.icon
@@ -137,29 +147,40 @@ export default function Pricing() {
                 </ul>
 
                 {/* Button */}
-                <Button
-                  className="mt-7 w-full justify-center"
-                  disabled={item.name === 'Plus' ? loading || !plan?.enabled || busy : false}
-                  onClick={item.name === 'Plus' ? subscribe : () => navigate('/register')}
-                >
-                  {item.name === 'Plus'
-                    ? busy
-                      ? t('Opening eSewa...')
-                      : isAuthenticated
-                        ? t('Subscribe with eSewa')
-                        : t('Sign in to subscribe')
-                    : t('Create account')}
-                  <FiArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
-                </Button>
+                {item.name === 'Plus' ? (
+                  <div className="mt-7 grid gap-2">
+                    {['esewa', 'khalti'].map((provider) => (
+                      <Button
+                        key={provider}
+                        className="w-full justify-center"
+                        variant={provider === 'khalti' ? 'secondary' : 'primary'}
+                        disabled={loading || !plan?.providers?.[provider] || Boolean(busyProvider)}
+                        onClick={() => subscribe(provider)}
+                      >
+                        {busyProvider === provider
+                          ? t(provider === 'esewa' ? 'Opening eSewa...' : 'Opening Khalti...')
+                          : isAuthenticated
+                            ? t(provider === 'esewa' ? 'Subscribe with eSewa' : 'Subscribe with Khalti')
+                            : t('Sign in to subscribe')}
+                        <FiArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+                      </Button>
+                    ))}
+                    {!loading && !plan?.enabled ? (
+                      <p className="text-center text-sm text-slate-500">{t('Plus checkout is not configured yet.')}</p>
+                    ) : null}
+                  </div>
+                ) : (
+                  <Button className="mt-7 w-full justify-center" onClick={() => navigate('/register')}>
+                    {t('Create account')}
+                    <FiArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+                  </Button>
+                )}
               </div>
             </Card>
           )
         })}
       </div>
       {error ? <p className="mt-4 text-center text-sm text-slate-500" role="status">{t(error)}</p> : null}
-      {!loading && !plan?.enabled && !error ? (
-        <p className="mt-4 text-center text-sm text-slate-500">{t('Plus checkout is not configured yet.')}</p>
-      ) : null}
     </main>
   )
 }

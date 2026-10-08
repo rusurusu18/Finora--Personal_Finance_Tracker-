@@ -1,6 +1,7 @@
 import express from "express";
 
 import * as transactionController from "./transaction.controller.js";
+import recurringTransactionRoutes from "./recurringTransaction.routes.js";
 import {
     createTransactionSchema,
     updateTransactionSchema
@@ -12,6 +13,7 @@ import { validate }     from "../../middleware/validateMiddleware.js";
 const router = express.Router();
 
 router.use(authenticate);
+router.use("/recurring", recurringTransactionRoutes);
 
 
 // GET    /api/transactions/summary  (before /:id)

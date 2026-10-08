@@ -4,6 +4,7 @@ dotenv.config();
 
 import app from "./app.js";
 import { seedDefaultCategories } from "./module/category/category.service.js";
+import { startRecurringTransactionScheduler } from "./module/transaction/recurringTransaction.scheduler.js";
 
 const PORT = process.env.PORT || 5000;
 
@@ -17,6 +18,8 @@ async function start() {
   }
 
   await seedDefaultCategories();
+
+  startRecurringTransactionScheduler();
 
   app.listen(PORT, () => {
     console.log(`Finora API listening on http://localhost:${PORT}`);

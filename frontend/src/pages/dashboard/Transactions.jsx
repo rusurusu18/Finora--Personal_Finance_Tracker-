@@ -28,6 +28,8 @@ const emptyForm = (calendar = 'AD') => ({
   description: '',
 })
 
+const getAccountPaymentSource = (account) => account?.institution || account?.provider || account?.name || ''
+
 export default function Transactions() {
   const { t } = useLanguage()
   const { transactions, categories, accounts, settings, addTransaction, editTransaction, removeTransaction } =
@@ -82,7 +84,7 @@ export default function Transactions() {
       ...emptyForm(settings.calendar),
       category: categories.find((item) => item.type === 'expense')?.name || '',
       accountId: accounts[0]?.id || '',
-      paymentSource: accounts[0]?.name || '',
+      paymentSource: getAccountPaymentSource(accounts[0]),
     })
     setErrors({})
     setOpen(true)
@@ -96,7 +98,7 @@ export default function Transactions() {
       type: transaction.type,
       category: transaction.category,
       date: settings.calendar === 'BS' ? convertDateToBikramSambat(transaction.date) : transaction.date,
-      paymentSource: transaction.paymentSource,
+      paymentSource: transaction.paymentSource || getAccountPaymentSource(accounts.find((account) => account.id === transaction.accountId)),
       accountId: transaction.accountId,
       description: transaction.description || '',
     })
@@ -165,7 +167,7 @@ export default function Transactions() {
           ? convertDateToBikramSambat(parsed.date)
           : parsed.date,
         accountId: account?.id || '',
-        paymentSource: account?.name || '',
+        paymentSource: getAccountPaymentSource(account),
       })
       setErrors({})
       setOpen(true)
@@ -211,6 +213,7 @@ export default function Transactions() {
       <TransactionFilters
         filters={filters}
         categories={categories}
+        accounts={accounts}
         calendar={settings.calendar}
         onChange={setFilters}
       />
@@ -291,7 +294,7 @@ export default function Transactions() {
             error={errors.accountId}
             onChange={(event) => {
               const account = accounts.find((item) => item.id === event.target.value)
-              setForm({ ...form, accountId: event.target.value, paymentSource: account?.name || '' })
+              setForm({ ...form, accountId: event.target.value, paymentSource: getAccountPaymentSource(account) })
             }}
           >
             <option value="">{t('Select an account')}</option>

@@ -4,19 +4,36 @@ import { ApiError } from "../../utils/apiError.js";
 
 const SIGNED_FIELDS = "total_amount,transaction_uuid,product_code";
 
-const configuration = () => {
-    const configuredAmount = Number(process.env.ESEWA_PLUS_AMOUNT);
+const planConfiguration = () => {
+    const configuredAmountValue = process.env.PLUS_PLAN_AMOUNT?.trim() || process.env.ESEWA_PLUS_AMOUNT;
+    const configuredAmount = Number(configuredAmountValue);
     const amount = Number.isFinite(configuredAmount) ? Number(moneyString(configuredAmount)) : NaN;
-    const durationDays = Number(process.env.ESEWA_PLUS_DURATION_DAYS);
-    const productCode = process.env.ESEWA_PRODUCT_CODE;
-    const secretKey = process.env.ESEWA_SECRET_KEY;
-    const enabled = Boolean(
-        productCode && secretKey && Number.isFinite(amount) && amount > 0 &&
+    const durationDaysValue = process.env.PLUS_PLAN_DURATION_DAYS?.trim() || process.env.ESEWA_PLUS_DURATION_DAYS;
+    const durationDays = Number(durationDaysValue);
+    const validPlan = Number.isFinite(amount) && amount > 0 &&
         Math.abs(configuredAmount * 100 - Math.round(configuredAmount * 100)) < 0.000001 &&
-        Number.isInteger(durationDays) && durationDays > 0
-    );
+        Number.isInteger(durationDays) && durationDays > 0;
 
-    return { amount, durationDays, productCode, secretKey, enabled };
+    return {
+        amount,
+        durationDays,
+        validPlan,
+        esewaProductCode: process.env.ESEWA_PRODUCT_CODE,
+        esewaSecretKey: process.env.ESEWA_SECRET_KEY,
+        khaltiSecretKey: process.env.KHALTI_SECRET_KEY
+    };
+};
+
+const configuration = () => {
+    const plan = planConfiguration();
+    const enabled = Boolean(plan.validPlan && plan.esewaProductCode && plan.esewaSecretKey);
+    return {
+        amount: plan.amount,
+        durationDays: plan.durationDays,
+        productCode: plan.esewaProductCode,
+        secretKey: plan.esewaSecretKey,
+        enabled
+    };
 };
 
 const isProduction = () => process.env.ESEWA_ENV === "production";
@@ -42,12 +59,18 @@ const requireConfiguration = () => {
 };
 
 export const getPlusPlan = () => {
-    const { amount, durationDays, enabled } = configuration();
+    const plan = planConfiguration();
+    const providers = {
+        esewa: Boolean(plan.validPlan && plan.esewaProductCode && plan.esewaSecretKey),
+        khalti: Boolean(plan.validPlan && plan.khaltiSecretKey)
+    };
+    const enabled = Object.values(providers).some(Boolean);
     return {
         name: "Finora Plus",
         currency: "NPR",
-        amount: enabled ? amount : null,
-        durationDays: enabled ? durationDays : null,
+        amount: enabled ? plan.amount : null,
+        durationDays: enabled ? plan.durationDays : null,
+        providers,
         enabled,
     };
 };
@@ -89,6 +112,64 @@ export const initiateEsewaPayment = async (userId) => {
             : "https://rc-epay.esewa.com.np/api/epay/main/v2/form",
         fields,
     };
+};
+
+export const initiateKhaltiPayment = async (userId) => {
+    const plan = planConfiguration();
+    if (!plan.validPlan || !plan.khaltiSecretKey) {
+        throw new ApiError(503, "Khalti checkout is not configured. Set KHALTI_SECRET_KEY and the Plus plan environment variables.");
+    }
+
+    const transactionUuid = randomUUID();
+    const payment = await prisma.subscriptionPayment.create({
+        data: {
+            userId,
+            transactionUuid,
+            provider: "KHALTI",
+            amount: plan.amount
+        }
+    });
+
+    let response;
+    try {
+        response = await fetch("https://a.khalti.com/api/v2/epayment/initiate/", {
+            method: "POST",
+            headers: {
+                Authorization: `Key ${plan.khaltiSecretKey}`,
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                return_url: `${frontendUrl()}/pricing/khalti/result`,
+                website_url: frontendUrl(),
+                amount: Math.round(plan.amount * 100),
+                purchase_order_id: transactionUuid,
+                purchase_order_name: "Finora Plus subscription"
+            }),
+            signal: AbortSignal.timeout(10_000)
+        });
+    } catch {
+        await prisma.subscriptionPayment.update({
+            where: { id: payment.id },
+            data: { status: "FAILED" }
+        });
+        throw new ApiError(502, "Khalti checkout could not be started. Please try again.");
+    }
+    const result = await response.json().catch(() => null);
+
+    if (!response.ok || typeof result?.pidx !== "string" || typeof result?.payment_url !== "string") {
+        await prisma.subscriptionPayment.update({
+            where: { id: payment.id },
+            data: { status: "FAILED" }
+        });
+        throw new ApiError(502, "Khalti checkout could not be started. Please try again.");
+    }
+
+    await prisma.subscriptionPayment.update({
+        where: { id: payment.id },
+        data: { pidx: result.pidx }
+    });
+
+    return { paymentUrl: result.payment_url };
 };
 
 const decodeResponse = (encodedResponse) => {
@@ -135,7 +216,7 @@ export const verifyEsewaPayment = async (userId, encodedResponse) => {
     verifyResponseSignature(paymentResponse, config.secretKey);
 
     const payment = await prisma.subscriptionPayment.findFirst({
-        where: { userId, transactionUuid: paymentResponse.transaction_uuid },
+        where: { userId, transactionUuid: paymentResponse.transaction_uuid, provider: "ESEWA" },
     });
     if (!payment) throw ApiError.notFound("Payment was not found for this account");
 
@@ -191,5 +272,89 @@ export const verifyEsewaPayment = async (userId, encodedResponse) => {
         }
 
         return { status: "COMPLETE", ...account };
+    });
+};
+
+export const verifyKhaltiPayment = async (userId, pidx) => {
+    const plan = planConfiguration();
+    if (!plan.validPlan || !plan.khaltiSecretKey) {
+        throw new ApiError(503, "Khalti checkout is not configured.");
+    }
+    if (typeof pidx !== "string" || !pidx || pidx.length > 128) {
+        throw ApiError.badRequest("Invalid Khalti payment reference");
+    }
+
+    const payment = await prisma.subscriptionPayment.findFirst({
+        where: { userId, pidx, provider: "KHALTI" }
+    });
+    if (!payment) throw ApiError.notFound("Khalti payment was not found for this account");
+
+    if (payment.status === "COMPLETE") {
+        const user = await prisma.user.findUnique({
+            where: { id: userId },
+            select: { subscriptionTier: true, subscriptionExpiresAt: true }
+        });
+        return { status: payment.status, ...user };
+    }
+    if (payment.status !== "PENDING") {
+        throw ApiError.badRequest("This Khalti payment is no longer pending");
+    }
+
+    let response;
+    try {
+        response = await fetch("https://a.khalti.com/api/v2/epayment/lookup/", {
+            method: "POST",
+            headers: {
+                Authorization: `Key ${plan.khaltiSecretKey}`,
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ pidx }),
+            signal: AbortSignal.timeout(10_000)
+        });
+    } catch {
+        throw new ApiError(502, "Unable to verify this payment with Khalti.");
+    }
+    const result = await response.json().catch(() => null);
+    if (!response.ok) throw new ApiError(502, "Unable to verify this payment with Khalti.");
+
+    if (
+        result?.status !== "Completed" ||
+        Number(result?.amount) !== Math.round(Number(payment.amount) * 100) ||
+        result?.purchase_order_id !== payment.transactionUuid
+    ) {
+        if (["User canceled", "Expired", "Refunded", "Partially Refunded"].includes(result?.status)) {
+            await prisma.subscriptionPayment.updateMany({
+                where: { id: payment.id, status: "PENDING" },
+                data: { status: "FAILED" }
+            });
+        }
+        throw ApiError.badRequest("Khalti has not confirmed this payment");
+    }
+
+    return prisma.$transaction(async (tx) => {
+        const updatedPayment = await tx.subscriptionPayment.updateMany({
+            where: { id: payment.id, status: "PENDING" },
+            data: { status: "COMPLETE", referenceId: result.transaction_id || null }
+        });
+
+        let user = await tx.user.findUnique({
+            where: { id: userId },
+            select: { subscriptionTier: true, subscriptionExpiresAt: true }
+        });
+        if (updatedPayment.count) {
+            const startDate = user.subscriptionExpiresAt > new Date()
+                ? user.subscriptionExpiresAt
+                : new Date();
+            const subscriptionExpiresAt = new Date(
+                startDate.getTime() + plan.durationDays * 24 * 60 * 60 * 1000
+            );
+            user = await tx.user.update({
+                where: { id: userId },
+                data: { subscriptionTier: "PLUS", subscriptionExpiresAt },
+                select: { subscriptionTier: true, subscriptionExpiresAt: true }
+            });
+        }
+
+        return { status: "COMPLETE", ...user };
     });
 };

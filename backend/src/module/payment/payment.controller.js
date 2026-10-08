@@ -22,3 +22,21 @@ export const verifyEsewaPayment = async (req, res, next) => {
         next(error);
     }
 };
+
+export const initiateKhaltiPayment = async (req, res, next) => {
+    try {
+        const result = await paymentService.initiateKhaltiPayment(req.user.id);
+        return createdResponse(res, { message: "Khalti checkout created", data: result });
+    } catch (error) {
+        next(error);
+    }
+};
+
+export const verifyKhaltiPayment = async (req, res, next) => {
+    try {
+        const result = await paymentService.verifyKhaltiPayment(req.user.id, req.body.pidx);
+        return successResponse(res, { message: "Khalti payment verified", data: result });
+    } catch (error) {
+        next(error);
+    }
+};

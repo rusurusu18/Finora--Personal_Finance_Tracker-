@@ -42,8 +42,8 @@ export default function Accounts() {
       name: form.name,
       type: form.type,
       balance: Number(form.balance),
-      institution: form.type === 'bank' ? form.institution : undefined,
-      provider: form.type !== 'bank' ? form.institution || form.name : undefined,
+      institution: form.type === 'cash' ? undefined : form.institution,
+      provider: form.type === 'wallet' ? form.institution || form.name : undefined,
     }
     if (editing) {
       await editAccount(editing.id, payload)
@@ -61,6 +61,7 @@ export default function Accounts() {
         <div>
           <h1 className="text-2xl font-semibold tracking-tight">{t('Accounts')}</h1>
           <p className="text-sm text-slate-500">{t('Bank accounts, cash, and digital wallets.')}</p>
+          <p className="mt-1 text-sm text-slate-500">{t('Track each bank, wallet, or cash balance separately; transactions adjust the selected account.')}</p>
         </div>
         <Button onClick={openCreate}><FiPlus aria-hidden="true" />{t('Add source')}</Button>
       </div>
@@ -105,12 +106,15 @@ export default function Accounts() {
               </option>
             ))}
           </Select>
-          <Input
-            id="account-institution"
-            label={t(form.type === 'bank' ? 'Bank' : 'Provider')}
-            value={form.institution}
-            onChange={(event) => setForm({ ...form, institution: event.target.value })}
-          />
+          {form.type !== 'cash' ? (
+            <Input
+              id="account-institution"
+              label={t(form.type === 'bank' ? 'Bank' : 'Provider')}
+              placeholder={form.type === 'wallet' ? t('eSewa, Khalti, Fonepay, or another wallet') : t('Bank or financial institution')}
+              value={form.institution}
+              onChange={(event) => setForm({ ...form, institution: event.target.value })}
+            />
+          ) : null}
           <Input
             id="account-balance"
             label={t('Balance')}

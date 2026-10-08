@@ -7,7 +7,7 @@ import { parsePagination, buildPaginationMeta } from "../../utils/pagination.js"
 // HELPERS – Account Balance
 // ==========================================
 
-const applyBalanceEffect = async (tx, transaction, reverse = false) => {
+export const applyBalanceEffect = async (tx, transaction, reverse = false) => {
 
     const sign = reverse ? -1 : 1;
 
