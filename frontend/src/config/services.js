@@ -1,6 +1,7 @@
 import { STORAGE_KEYS } from '../utils/constants'
 import { notifyAppError } from '../utils/appErrors'
 
+// Local API runs on port 5000; keep this in sync with the backend startup URL.
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api/v1'
 const NETWORK_ERROR_MESSAGE = 'The service is temporarily unavailable. Please check your connection and try again.'
 

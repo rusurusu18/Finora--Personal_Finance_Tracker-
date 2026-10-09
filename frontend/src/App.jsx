@@ -8,17 +8,21 @@ import Chatbot from './components/ui/Chatbot'
 
 export default function App() {
   return (
-    <ThemeProvider>
-      <LanguageProvider>
-        <ToastProvider>
-          <AuthProvider>
-            <FinanceProvider>
-              <AppRouter />
-              <Chatbot />
-            </FinanceProvider>
-          </AuthProvider>
-        </ToastProvider>
-      </LanguageProvider>
-    </ThemeProvider>
+    <>
+      {/* Global app providers keep shared state available across the app. */}
+      <ThemeProvider>
+        <LanguageProvider>
+          <ToastProvider>
+            <AuthProvider>
+              <FinanceProvider>
+                {/* The router handles page navigation, while the chatbot stays visible globally. */}
+                <AppRouter />
+                <Chatbot />
+              </FinanceProvider>
+            </AuthProvider>
+          </ToastProvider>
+        </LanguageProvider>
+      </ThemeProvider>
+    </>
   )
 }
