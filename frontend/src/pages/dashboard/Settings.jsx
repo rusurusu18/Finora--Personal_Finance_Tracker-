@@ -11,6 +11,8 @@ import Select from '../../components/ui/Select'
 import { CURRENCIES } from '../../utils/constants'
 import { useLanguage } from '../../contexts/useLanguage'
 
+// Settings page for app preferences and financial configuration.
+
 export default function Settings() {
   const { t } = useLanguage()
   const { user, updateProfile } = useAuth()

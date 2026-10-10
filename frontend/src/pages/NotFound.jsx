@@ -3,6 +3,8 @@ import Button from '../components/ui/Button'
 import { FiAlertCircle, FiGrid, FiHome } from 'react-icons/fi'
 import { useLanguage } from '../contexts/useLanguage'
 
+// 404 page displayed when a route does not exist.
+
 export default function NotFound() {
   const { t } = useLanguage()
   return (

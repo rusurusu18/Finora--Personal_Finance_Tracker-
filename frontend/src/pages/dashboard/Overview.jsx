@@ -24,6 +24,8 @@ import {
   FiTrendingUp,
 } from 'react-icons/fi'
 
+// Dashboard overview page with summary cards and financial trends.
+
 export default function Overview() {
   const { t } = useLanguage()
   const { user } = useAuth()

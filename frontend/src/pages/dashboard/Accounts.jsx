@@ -11,6 +11,8 @@ import { ACCOUNT_TYPES } from '../../utils/constants'
 import { FiPlus } from 'react-icons/fi'
 import { useLanguage } from '../../contexts/useLanguage'
 
+// Accounts page for managing personal and financial accounts.
+
 export default function Accounts() {
   const { t } = useLanguage()
   const { accounts, settings, addAccount, editAccount, removeAccount } = useFinance()

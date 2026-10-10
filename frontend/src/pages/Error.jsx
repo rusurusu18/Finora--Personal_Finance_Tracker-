@@ -2,6 +2,8 @@ import { Link } from 'react-router-dom'
 import Button from '../ui/Button'
 import { useLanguage } from '../contexts/useLanguage'
 
+// Fallback page shown when the app hits a runtime error.
+
 export default function Error() {
   const { t } = useLanguage()
   return (

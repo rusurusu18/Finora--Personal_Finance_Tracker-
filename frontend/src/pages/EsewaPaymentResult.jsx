@@ -5,6 +5,8 @@ import { verifyEsewaPayment } from '../config/services'
 import { useAuth } from '../contexts/AuthContext'
 import { useLanguage } from '../contexts/useLanguage'
 
+// Payment result page for successful or failed Esewa transactions.
+
 export default function EsewaPaymentResult() {
   const { t } = useLanguage()
   const location = useLocation()

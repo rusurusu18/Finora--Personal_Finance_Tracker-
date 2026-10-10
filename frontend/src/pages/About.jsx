@@ -59,6 +59,8 @@ const stack = [
   { label: 'Validation', tech: 'Zod', icon: FiCheckCircle },
 ]
 
+// About page sharing the mission, values, and product story.
+
 export default function About() {
   const navigate = useNavigate()
   const { t } = useLanguage()

@@ -8,6 +8,8 @@ import PasswordInput from '../../components/ui/PasswordInput'
 import { FiLogIn } from 'react-icons/fi'
 import { useLanguage } from '../../contexts/useLanguage'
 
+// Login page for existing users to sign in to the app.
+
 export default function Login() {
   const { login } = useAuth()
   const { t } = useLanguage()

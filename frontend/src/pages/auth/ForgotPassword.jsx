@@ -8,6 +8,8 @@ import { forgotPasswordRequest } from '../../config/services'
 import { FiMail } from 'react-icons/fi'
 import { useLanguage } from '../../contexts/useLanguage'
 
+// Password recovery page for users who need account access help.
+
 export default function ForgotPassword() {
   const { t } = useLanguage()
   const [email, setEmail] = useState('')

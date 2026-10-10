@@ -10,6 +10,8 @@ import { downloadCsv, formatCurrency, formatDate } from '../../utils/helpers'
 import { FiDownload, FiFileText, FiPrinter } from 'react-icons/fi'
 import { useLanguage } from '../../contexts/useLanguage'
 
+// Reports page for reviewing financial summaries and exports.
+
 export default function Reports() {
   const { t } = useLanguage()
   const { transactions, settings, accounts, savingsGoals, loanPlans } = useFinance()

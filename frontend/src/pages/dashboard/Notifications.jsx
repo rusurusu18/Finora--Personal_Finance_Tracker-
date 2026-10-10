@@ -5,6 +5,8 @@ import Button from '../../components/ui/Button'
 import { FiBell } from 'react-icons/fi'
 import { useLanguage } from '../../contexts/useLanguage'
 
+// Notifications page showing inbox updates and reminders.
+
 export default function Notifications() {
   const { t } = useLanguage()
   const { notifications, readNotification } = useFinance()

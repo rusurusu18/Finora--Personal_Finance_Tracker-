@@ -39,6 +39,8 @@ function calculateEmi(principalValue, rateValue, termValue) {
   }
 }
 
+// Loan calculator page for planning loans and repayment scenarios.
+
 export default function LoanCalculator() {
   const { t } = useLanguage()
   const { settings, loanPlans, addLoanPlan, removeLoanPlan } = useFinance()

@@ -4,6 +4,8 @@ import Button from '../../components/ui/Button'
 import { useAuth } from '../../contexts/AuthContext'
 import { useLanguage } from '../../contexts/useLanguage'
 
+// Profile page for editing personal account details.
+
 export default function Profile() {
   const { user, updateProfile } = useAuth()
   const { t } = useLanguage()

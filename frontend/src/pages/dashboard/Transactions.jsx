@@ -30,6 +30,8 @@ const emptyForm = (calendar = 'AD') => ({
 
 const getAccountPaymentSource = (account) => account?.institution || account?.provider || account?.name || ''
 
+// Transactions page for viewing and managing all recorded financial activity.
+
 export default function Transactions() {
   const { t } = useLanguage()
   const { transactions, categories, accounts, settings, addTransaction, editTransaction, removeTransaction } =

@@ -19,6 +19,8 @@ function getUserFacingRequestError(error, fallbackMessage) {
   return message || 'Something went wrong. Please try again.'
 }
 
+// Pricing page describing plans and payment options.
+
 export default function Pricing() {
   const navigate = useNavigate()
   const { t } = useLanguage()

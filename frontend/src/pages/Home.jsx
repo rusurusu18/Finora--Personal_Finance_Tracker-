@@ -5,6 +5,8 @@ import HeroSection from '../components/HomePageComponent/HeroSection'
 import HowItWorksSection from '../components/HomePageComponent/HowItWorksSection'
 import NepalFirstSection from '../components/HomePageComponent/NepalFirstSection'
 
+// Landing page with the hero section and product highlights.
+
 export default function Home() {
   const navigate = useNavigate()
 

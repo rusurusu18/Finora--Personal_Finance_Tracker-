@@ -13,6 +13,8 @@ import { convertDateToBikramSambat, convertDateToGregorian } from '../../utils/h
 const defaultTargetDate = () =>
   new Date(Date.UTC(new Date().getUTCFullYear() + 1, 11, 31)).toISOString().slice(0, 10)
 
+// Savings goals page for setting and tracking financial goals.
+
 export default function SavingsGoals() {
   const { t } = useLanguage()
   const { savingsGoals, settings, addGoal, editGoal, removeGoal } = useFinance()

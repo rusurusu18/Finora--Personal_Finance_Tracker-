@@ -47,6 +47,8 @@ function toGregorianDate(value, calendar) {
   return converted
 }
 
+// Recurring transactions page for scheduled income and expenses.
+
 export default function RecurringTransactions() {
   const { t } = useLanguage()
   const { accounts, categories, settings } = useFinance()

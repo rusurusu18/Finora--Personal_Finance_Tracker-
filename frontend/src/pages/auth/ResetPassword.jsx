@@ -5,6 +5,8 @@ import { resetPasswordRequest } from '../../config/services'
 import { FiKey } from 'react-icons/fi'
 import { useLanguage } from '../../contexts/useLanguage'
 
+// Password reset page for updating a user password.
+
 export default function ResetPassword() {
   const { t } = useLanguage()
   const navigate = useNavigate()

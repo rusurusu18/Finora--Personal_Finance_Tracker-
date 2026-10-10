@@ -8,6 +8,8 @@ import PasswordInput from '../../components/ui/PasswordInput'
 import { FiUserPlus } from 'react-icons/fi'
 import { useLanguage } from '../../contexts/useLanguage'
 
+// Registration page for new users creating an account.
+
 export default function Register() {
   const { register } = useAuth()
   const { t } = useLanguage()

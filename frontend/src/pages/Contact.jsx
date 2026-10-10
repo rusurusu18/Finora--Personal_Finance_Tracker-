@@ -13,6 +13,8 @@ import {
 } from 'react-icons/fi'
 import { useLanguage } from '../contexts/useLanguage'
 
+// Contact page for user inquiries and support messages.
+
 export default function Contact() {
   const { t } = useLanguage()
   const [form, setForm] = useState({ name: '', email: '', message: '' })

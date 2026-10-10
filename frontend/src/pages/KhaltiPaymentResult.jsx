@@ -5,6 +5,8 @@ import { verifyKhaltiPayment } from '../config/services'
 import { useAuth } from '../contexts/AuthContext'
 import { useLanguage } from '../contexts/useLanguage'
 
+// Payment result page for Khalti checkout responses.
+
 export default function KhaltiPaymentResult() {
   const { t } = useLanguage()
   const location = useLocation()

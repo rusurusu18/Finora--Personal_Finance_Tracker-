@@ -12,6 +12,8 @@ import { clampPercent, percent } from '../../utils/helpers'
 import { FiPlus } from 'react-icons/fi'
 import { useLanguage } from '../../contexts/useLanguage'
 
+// Budgets page for tracking spending categories and limits.
+
 export default function Budgets() {
   const { t } = useLanguage()
   const { budgets, categories, settings, addBudget, editBudget, removeBudget } = useFinance()

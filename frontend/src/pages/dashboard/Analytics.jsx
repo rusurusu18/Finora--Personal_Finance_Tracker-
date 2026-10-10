@@ -7,6 +7,8 @@ import { getCategorySpending, getMonthlyTrend, getSourceSpending } from '../../u
 import { FiActivity, FiBarChart2, FiCreditCard, FiPieChart } from 'react-icons/fi'
 import { useLanguage } from '../../contexts/useLanguage'
 
+// Analytics page for budget and spending insights.
+
 export default function Analytics() {
   const { t } = useLanguage()
   const { transactions, settings } = useFinance()
