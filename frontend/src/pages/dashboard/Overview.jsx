@@ -9,6 +9,7 @@ import StatCard from '../../components/sections/StatCard'
 import AreaChart from '../../components/sections/AreaChart'
 import SpendingOverview from '../../components/sections/SpendingOverview'
 import SectionCard from '../../components/sections/SectionCard'
+import AIInsights from '../../components/sections/AIInsights'
 import Skeleton from '../../components/ui/Skeleton'
 import { getCategorySpending, getFinancialHealthScore, getMonthlyTrend, getNetWorthSummary } from '../../utils/dashboardData'
 import { formatCurrency, getGreeting } from '../../utils/helpers'
@@ -72,6 +73,8 @@ export default function Overview() {
         <StatCard label={t('Savings')} value={monthStats.savings} currency={currency} icon={FiTrendingUp} />
         <StatCard label={t('Budget remaining')} value={budgetRemaining} currency={currency} icon={FiPieChart} />
       </div>
+
+      <AIInsights />
 
       <div className="grid gap-4 lg:grid-cols-2">
         <SectionCard title={t('Financial Health Score')} description={t('Your balance of savings, debt, and budget discipline.')}> 

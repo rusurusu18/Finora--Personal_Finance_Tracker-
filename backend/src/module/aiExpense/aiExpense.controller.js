@@ -9,3 +9,12 @@ export const parseExpense = async (req, res, next) => {
         next(error);
     }
 };
+
+export const getFinancialInsights = async (req, res, next) => {
+    try {
+        const insights = await aiExpenseService.getFinancialInsights(req.user.id);
+        return successResponse(res, { message: "Financial insights generated", data: insights });
+    } catch (error) {
+        next(error);
+    }
+};

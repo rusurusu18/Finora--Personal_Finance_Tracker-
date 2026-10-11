@@ -13,7 +13,7 @@ import { TRANSACTION_TYPES } from '../../utils/constants'
 import { hasErrors, validateTransaction } from '../../utils/validators'
 import { convertDateToBikramSambat, convertDateToGregorian, localDateISO } from '../../utils/helpers'
 import { parseExpenseRequest } from '../../config/services'
-import { FiPlus } from 'react-icons/fi'
+import { FiPlus, FiZap } from 'react-icons/fi'
 import { useLanguage } from '../../contexts/useLanguage'
 import Card from '../../components/ui/Card'
 
@@ -192,7 +192,10 @@ export default function Transactions() {
 
       <Card className="p-5">
         <div className="mb-3">
-          <h2 className="font-semibold">{t('Describe your expense')}</h2>
+          <h2 className="flex items-center gap-2 font-semibold">
+            <FiZap aria-hidden="true" className="text-indigo-500" />
+            {t('AI Smart Expense Entry')}
+          </h2>
           <p className="mt-1 text-sm text-slate-500">{t('Write naturally in English or Nepali, e.g. “lunch 450 rupees yesterday”.')}</p>
         </div>
         <textarea
@@ -207,7 +210,8 @@ export default function Transactions() {
         <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
           <p className="max-w-2xl text-xs text-slate-500">{t('Your text is sent to Google Gemini for parsing. Review the draft before saving it.')}</p>
           <Button onClick={handleParseExpense} disabled={parsing || naturalText.trim().length < 3}>
-            {parsing ? t('Parsing…') : t('Parse with Gemini')}
+            <FiZap aria-hidden="true" />
+            {parsing ? t('Parsing…') : t('Create expense draft with AI')}
           </Button>
         </div>
       </Card>

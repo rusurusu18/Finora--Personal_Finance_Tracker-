@@ -305,6 +305,10 @@ export async function parseExpenseRequest({ text, categories, currentDate }) {
   return getData('/ai-expenses/parse', json('POST', { text, categories, currentDate }))
 }
 
+export async function getFinancialInsightsRequest() {
+  return getData('/ai-expenses/insights')
+}
+
 export async function getNotifications(unreadOnly = false) {
   return (await getData(withQuery('/notifications', { unread: unreadOnly ? true : undefined }))).map((notification) => ({
     ...notification,

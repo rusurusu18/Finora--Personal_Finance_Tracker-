@@ -9,5 +9,6 @@ const router = express.Router();
 
 router.use(authenticate, aiExpenseLimiter);
 router.post("/parse", validate(parseExpenseSchema), aiExpenseController.parseExpense);
+router.get("/insights", aiExpenseController.getFinancialInsights);
 
 export default router;
