@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useMemo, useState } from 'react'
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { loginRequest, registerRequest, updateProfileRequest } from '../config/services'
 import { STORAGE_KEYS } from '../utils/constants'
 import { hasErrors, validateLogin, validateRegister } from '../utils/validators'
@@ -42,6 +42,16 @@ export function AuthProvider({ children }) {
       localStorage.removeItem(STORAGE_KEYS.refreshToken)
     }
   }, [])
+
+  useEffect(() => {
+    const handleAuthExpired = () => {
+      persist(null)
+      setStatus('idle')
+    }
+
+    window.addEventListener('finora:auth-expired', handleAuthExpired)
+    return () => window.removeEventListener('finora:auth-expired', handleAuthExpired)
+  }, [persist])
 
   const login = useCallback(async (credentials) => {
     const errors = validateLogin(credentials)

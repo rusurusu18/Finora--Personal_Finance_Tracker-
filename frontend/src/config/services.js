@@ -4,27 +4,96 @@ import { notifyAppError } from '../utils/appErrors'
 // Local API runs on port 5000; keep this in sync with the backend startup URL.
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api/v1'
 const NETWORK_ERROR_MESSAGE = 'The service is temporarily unavailable. Please check your connection and try again.'
+let tokenRefreshPromise
 
-export async function apiRequest(path, options = {}) {
-  const accessToken = localStorage.getItem(STORAGE_KEYS.accessToken)
-  const response = await fetch(`${API_BASE_URL}${path}`, {
+async function requestWithToken(path, options, accessToken) {
+  return fetch(`${API_BASE_URL}${path}`, {
     ...options,
     headers: {
       ...(options.body ? { 'Content-Type': 'application/json' } : {}),
       ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
       ...options.headers,
     },
-  }).catch((requestError) => {
+  })
+}
+
+function refreshAccessToken() {
+  if (!tokenRefreshPromise) {
+    tokenRefreshPromise = refreshTokenRequest()
+      .then(({ accessToken }) => {
+        if (!accessToken) {
+          const error = new Error('The refresh response did not include an access token.')
+          error.authExpired = true
+          throw error
+        }
+        localStorage.setItem(STORAGE_KEYS.accessToken, accessToken)
+        return accessToken
+      })
+      .finally(() => {
+        tokenRefreshPromise = null
+      })
+  }
+  return tokenRefreshPromise
+}
+
+function clearStoredSession() {
+  localStorage.removeItem(STORAGE_KEYS.accessToken)
+  localStorage.removeItem(STORAGE_KEYS.refreshToken)
+  localStorage.removeItem(STORAGE_KEYS.user)
+  window.dispatchEvent(new Event('finora:auth-expired'))
+}
+
+function isRefreshableRequest(path) {
+  return ![
+    '/auth/login',
+    '/auth/register',
+    '/auth/refresh-token',
+    '/auth/forgot-password',
+    '/auth/reset-password',
+  ].includes(path)
+}
+
+export async function apiRequest(path, options = {}) {
+  const handleRequestError = (requestError) => {
     const message = requestError instanceof TypeError
       ? NETWORK_ERROR_MESSAGE
       : requestError.message || 'The request could not be completed.'
     notifyAppError(message)
     throw new Error(message, { cause: requestError })
-  })
+  }
+  const accessToken = localStorage.getItem(STORAGE_KEYS.accessToken)
+  let response
+  try {
+    response = await requestWithToken(path, options, accessToken)
+  } catch (requestError) {
+    handleRequestError(requestError)
+  }
+
+  let didRefresh = false
+  if (response.status === 401 && accessToken && isRefreshableRequest(path)) {
+    if (!localStorage.getItem(STORAGE_KEYS.refreshToken)) {
+      clearStoredSession()
+    } else {
+      try {
+        const refreshedAccessToken = await refreshAccessToken()
+        response = await requestWithToken(path, options, refreshedAccessToken)
+        didRefresh = true
+      } catch (requestError) {
+        if (requestError.authExpired) {
+          clearStoredSession()
+        }
+        handleRequestError(requestError)
+      }
+    }
+  }
+
   const body = await response.json().catch(() => ({}))
 
   if (!response.ok || body.success === false) {
     const error = new Error(body.message || 'The request could not be completed.')
+    if (response.status === 401 && didRefresh) {
+      clearStoredSession()
+    }
     error.validationErrors = Array.isArray(body.errors)
       ? body.errors.map((issue) => ({ field: issue.path?.[0], message: issue.message }))
       : []
@@ -373,9 +442,23 @@ export async function registerRequest(payload) {
 
 export async function refreshTokenRequest(refreshToken = localStorage.getItem(STORAGE_KEYS.refreshToken)) {
   if (!refreshToken) {
-    throw new Error('A refresh token is required.')
+    const error = new Error('A refresh token is required.')
+    error.authExpired = true
+    throw error
   }
-  return getData('/auth/refresh-token', json('POST', { refreshToken }))
+  const response = await fetch(`${API_BASE_URL}/auth/refresh-token`, {
+    ...json('POST', { refreshToken }),
+    headers: { 'Content-Type': 'application/json' },
+  })
+  const body = await response.json().catch(() => ({}))
+
+  if (!response.ok || body.success === false) {
+    const error = new Error(body.message || 'The session could not be refreshed.')
+    error.authExpired = response.status === 401
+    throw error
+  }
+
+  return body.data
 }
 
 export async function logoutRequest() {
