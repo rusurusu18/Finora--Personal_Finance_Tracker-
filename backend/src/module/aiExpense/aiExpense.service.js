@@ -1,4 +1,5 @@
 import { z } from "zod";
+import prisma from "../../config/database.js";
 import { ApiError } from "../../utils/apiError.js";
 
 const parsedExpenseSchema = z.object({
