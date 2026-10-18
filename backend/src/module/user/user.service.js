@@ -2,9 +2,7 @@ import prisma from "../../config/database.js";
 import { ApiError } from "../../utils/apiError.js";
 
 
-// ==========================================
 // GET MY PROFILE
-// ==========================================
 
 export const getMe = async (userId) => {
 
@@ -37,10 +35,7 @@ export const getMe = async (userId) => {
 };
 
 
-// ==========================================
 // UPDATE PROFILE
-// ==========================================
-
 export const updateMe = async (userId, data) => {
 
     const user = await prisma.user.update({
@@ -62,10 +57,7 @@ export const updateMe = async (userId, data) => {
 };
 
 
-// ==========================================
 // DELETE MY ACCOUNT
-// ==========================================
-
 export const deleteMe = async (userId) => {
 
     await prisma.user.delete({

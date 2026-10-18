@@ -2,10 +2,7 @@ import * as userService from "./user.service.js";
 import { successResponse } from "../../utils/apiResponse.js";
 
 
-// ==========================================
 // GET MY PROFILE
-// ==========================================
-
 export const getMe = async (req, res, next) => {
     try {
         const user = await userService.getMe(req.user.id);
@@ -15,11 +12,7 @@ export const getMe = async (req, res, next) => {
     }
 };
 
-
-// ==========================================
 // UPDATE MY PROFILE
-// ==========================================
-
 export const updateMe = async (req, res, next) => {
     try {
         const user = await userService.updateMe(req.user.id, req.body);
@@ -29,11 +22,7 @@ export const updateMe = async (req, res, next) => {
     }
 };
 
-
-// ==========================================
 // DELETE MY ACCOUNT
-// ==========================================
-
 export const deleteMe = async (req, res, next) => {
     try {
         const result = await userService.deleteMe(req.user.id);

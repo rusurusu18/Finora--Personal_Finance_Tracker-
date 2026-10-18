@@ -1,10 +1,7 @@
 import { z } from "zod";
 
 
-// ==========================================
 // UPDATE PROFILE
-// ==========================================
-
 export const updateProfileSchema = z.object({
 
     fullName: z
