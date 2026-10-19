@@ -1,9 +1,6 @@
 import prisma from "../../config/database.js";
 
-// ==========================================
 // GET DASHBOARD SUMMARY
-// ==========================================
-
 export const getDashboardSummary = async (userId) => {
     // 1. Get Accounts and Total Balance
     const accounts = await prisma.account.findMany({

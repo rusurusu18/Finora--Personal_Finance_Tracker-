@@ -1,10 +1,7 @@
 import * as dashboardService from "./dashboard.service.js";
 import { successResponse } from "../../utils/apiResponse.js";
 
-// ==========================================
 // GET DASHBOARD SUMMARY
-// ==========================================
-
 export const getDashboardSummary = async (req, res, next) => {
     try {
         const userId = req.user.id;
