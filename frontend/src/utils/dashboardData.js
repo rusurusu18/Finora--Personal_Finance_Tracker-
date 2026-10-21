@@ -1,5 +1,6 @@
 import { formatCurrency, isCurrentMonth, monthKey, percent, sumBy } from './helpers'
 
+// Calculates account balances, net worth, financial health, monthly statistics, budget balances, spending breakdowns, financial trends, and insight comparisons.
 export function getAccountTotals(accounts, savingsGoals = []) {
   const bank = accounts
     .filter((account) => account.type === 'bank')
