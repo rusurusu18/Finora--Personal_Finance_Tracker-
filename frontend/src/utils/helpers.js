@@ -1,5 +1,7 @@
 import { adToBs, bsToAd } from '@sbmdkl/nepali-date-converter'
 
+// Utility functions for formatting, date conversion, calculations, grouping, and CSV downloads.
+
 export function cn(...classes) {
   return classes.filter(Boolean).join(' ')
 }
