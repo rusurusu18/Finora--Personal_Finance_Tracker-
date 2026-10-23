@@ -1,10 +1,12 @@
 import * as paymentService from "./payment.service.js";
 import { successResponse, createdResponse } from "../../utils/apiResponse.js";
 
+// Handles Plus plan retrieval and eSewa/Khalti payment operations.
 export const getPlusPlan = (req, res) => {
     return successResponse(res, { message: "Plus plan retrieved", data: paymentService.getPlusPlan() });
 };
 
+// Initiates an eSewa payment for the authenticated user.
 export const initiateEsewaPayment = async (req, res, next) => {
     try {
         const result = await paymentService.initiateEsewaPayment(req.user.id);
@@ -14,6 +16,7 @@ export const initiateEsewaPayment = async (req, res, next) => {
     }
 };
 
+// Verifies the eSewa payment using the data received in the request.
 export const verifyEsewaPayment = async (req, res, next) => {
     try {
         const result = await paymentService.verifyEsewaPayment(req.user.id, req.body.data);
@@ -23,6 +26,7 @@ export const verifyEsewaPayment = async (req, res, next) => {
     }
 };
 
+// Initiates a Khalti payment for the authenticated user.
 export const initiateKhaltiPayment = async (req, res, next) => {
     try {
         const result = await paymentService.initiateKhaltiPayment(req.user.id);
@@ -32,6 +36,7 @@ export const initiateKhaltiPayment = async (req, res, next) => {
     }
 };
 
+// Verifies the Khalti payment using the transaction pidx.
 export const verifyKhaltiPayment = async (req, res, next) => {
     try {
         const result = await paymentService.verifyKhaltiPayment(req.user.id, req.body.pidx);
