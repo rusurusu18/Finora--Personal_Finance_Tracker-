@@ -1,7 +1,7 @@
 import * as goalService from "./goal.service.js";
 import { successResponse, createdResponse } from "../../utils/apiResponse.js";
 
-
+//get
 export const getGoals = async (req, res, next) => {
     try {
         const { status } = req.query;
@@ -17,6 +17,7 @@ export const getGoal = async (req, res, next) => {
     } catch (error) { next(error); }
 };
 
+//create
 export const createGoal = async (req, res, next) => {
     try {
         const goal = await goalService.createGoal(req.user.id, req.body);
@@ -24,6 +25,7 @@ export const createGoal = async (req, res, next) => {
     } catch (error) { next(error); }
 };
 
+//update
 export const updateGoal = async (req, res, next) => {
     try {
         const goal = await goalService.updateGoal(req.user.id, req.params.id, req.body);
@@ -31,6 +33,7 @@ export const updateGoal = async (req, res, next) => {
     } catch (error) { next(error); }
 };
 
+//delete
 export const depositToGoal = async (req, res, next) => {
     try {
         const goal = await goalService.depositToGoal(req.user.id, req.params.id, req.body.amount);
