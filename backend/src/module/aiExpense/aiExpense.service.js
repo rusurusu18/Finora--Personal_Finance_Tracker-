@@ -47,6 +47,33 @@ const insightsSchema = z.object({
     })).min(1).max(4)
 });
 
+const createAbortSignal = (timeoutMs) => {
+    if (typeof AbortSignal !== "undefined" && typeof AbortSignal.timeout === "function") {
+        return { signal: AbortSignal.timeout(timeoutMs), cleanup: () => undefined };
+    }
+
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+    return {
+        signal: controller.signal,
+        cleanup: () => clearTimeout(timeoutId)
+    };
+};
+
+const parseJsonText = (responseText) => {
+    if (typeof responseText !== "string") return null;
+
+    const normalized = responseText.trim();
+    const jsonBlockMatch = normalized.match(/^```(?:json)?\s*([\s\S]*?)\s*```$/i);
+    const candidate = jsonBlockMatch ? jsonBlockMatch[1].trim() : normalized;
+
+    try {
+        return JSON.parse(candidate);
+    } catch {
+        return null;
+    }
+};
+
 const readGeminiResponse = async ({
     prompt,
     responseSchema: schema,
@@ -57,6 +84,8 @@ const readGeminiResponse = async ({
     if (!apiKey) throw new ApiError(503, missingApiKeyMessage);
 
     let response;
+    const timeout = createAbortSignal(15000);
+
     try {
         response = await fetch(
             "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent",
@@ -75,11 +104,13 @@ const readGeminiResponse = async ({
                         maxOutputTokens
                     }
                 }),
-                signal: AbortSignal.timeout(15000)
+                signal: timeout.signal
             }
         );
     } catch {
         throw new ApiError(502, "AI service could not be reached");
+    } finally {
+        timeout.cleanup();
     }
 
     if (!response.ok) {
@@ -91,11 +122,10 @@ const readGeminiResponse = async ({
         ?.find((part) => typeof part.text === "string")?.text;
     if (!responseText) throw new ApiError(502, "AI returned an invalid response");
 
-    try {
-        return JSON.parse(responseText);
-    } catch {
-        throw new ApiError(502, "AI returned an invalid response");
-    }
+    const parsedResponse = parseJsonText(responseText);
+    if (!parsedResponse) throw new ApiError(502, "AI returned an invalid response");
+
+    return parsedResponse;
 };
 
 export const parseExpense = async ({ text, categories, currentDate }) => {

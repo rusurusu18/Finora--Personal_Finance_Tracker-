@@ -1,6 +1,19 @@
 import prisma from "../../config/database.js";
 import { ApiError } from "../../utils/apiError.js";
 
+const createAbortSignal = (timeoutMs) => {
+    if (typeof AbortSignal !== "undefined" && typeof AbortSignal.timeout === "function") {
+        return { signal: AbortSignal.timeout(timeoutMs), cleanup: () => undefined };
+    }
+
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+    return {
+        signal: controller.signal,
+        cleanup: () => clearTimeout(timeoutId)
+    };
+};
+
 export const translateText = async (userId, text) => {
     const apiKey = process.env.GOOGLE_TRANSLATE_API_KEY;
     if (!apiKey) {
@@ -8,6 +21,8 @@ export const translateText = async (userId, text) => {
     }
 
     let response;
+    const timeout = createAbortSignal(20000);
+
     try {
         const endpoint = process.env.GOOGLE_TRANSLATE_API_URL
             || "https://translation.googleapis.com/language/translate/v2";
@@ -23,10 +38,12 @@ export const translateText = async (userId, text) => {
                 target: "ne",
                 format: "text",
             }),
-            signal: AbortSignal.timeout(20000)
+            signal: timeout.signal
         });
     } catch {
         throw new ApiError(502, "Translation service could not be reached");
+    } finally {
+        timeout.cleanup();
     }
 
     if (!response.ok) {
