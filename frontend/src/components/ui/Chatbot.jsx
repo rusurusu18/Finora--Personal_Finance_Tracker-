@@ -1,25 +1,19 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Bot, ChevronDown, MessageCircle, Send, Sparkles, X } from 'lucide-react'
+import { Link } from 'react-router-dom'
 import { useFinance } from '../../hooks/useFinance'
 import { useAuth } from '../../contexts/AuthContext'
 import { useLanguage } from '../../contexts/useLanguage'
 
-const STORAGE_KEY = 'finora_chat_messages'
+const LEGACY_STORAGE_KEY = 'finora_chat_messages'
 
-const starterMessages = [
-  {
+function getWelcomeMessage(isAuthenticated) {
+  return {
     id: 'welcome',
     role: 'assistant',
-    content: 'Hi! I’m Finora Guide. Ask me about your balance, spending, budgets, or savings goals.',
-  },
-]
-
-function readMessages() {
-  try {
-    const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null')
-    return Array.isArray(saved) && saved.length ? saved : starterMessages
-  } catch {
-    return starterMessages
+    content: isAuthenticated
+      ? 'Hi! I’m Finora Guide. Ask me about your balance, spending, budgets, or savings goals.'
+      : 'Hi! I’m Finora Guide. I can help you sign in, create an account, or reset your password. Log in to ask about your finances.',
   }
 }
 
@@ -27,10 +21,34 @@ function formatMoney(value, currency) {
   return `${currency} ${Number(value || 0).toLocaleString('en-IN', { maximumFractionDigits: 0 })}`
 }
 
-function createReply(question, { totals, monthStats, budgetRemaining, savingsGoals, settings }, language) {
+function createReply(question, { totals, monthStats, budgetRemaining, savingsGoals, settings }, language, isAuthenticated) {
   const prompt = question.toLowerCase()
   const currency = settings.currency
   const nepali = language === 'ne'
+
+  if (!isAuthenticated) {
+    if (/register|sign.?up|create.*account|new account|खाता खोल/.test(prompt)) {
+      return nepali
+        ? 'खाता खोल्न “खाता खोल्नुहोस्” छान्नुहोस्, आफ्नो नाम र इमेल लेख्नुहोस् र पासवर्ड बनाउनुहोस्।'
+        : 'To create an account, choose “Create account”, enter your name and email, and set a password.'
+    }
+
+    if (/forgot|reset|password|पासवर्ड/.test(prompt)) {
+      return nepali
+        ? 'पासवर्ड बिर्सनुभयो भने लगइन पृष्ठमा “पासवर्ड बिर्सनुभयो?” छान्नुहोस् र इमेलमा आएको निर्देशन पालना गर्नुहोस्।'
+        : 'If you forgot your password, choose “Forgot password” on the sign-in page and follow the instructions sent to your email.'
+    }
+
+    if (/log.?in|sign.?in|signin|लगइन|साइन इन/.test(prompt)) {
+      return nepali
+        ? 'लगइन गर्न “साइन इन” छान्नुहोस् र आफ्नो खाताको इमेल तथा पासवर्ड लेख्नुहोस्। पासवर्ड बिर्सनुभयो भने “पासवर्ड बिर्सनुभयो?” प्रयोग गर्नुहोस्।'
+        : 'Choose “Sign in” and enter the email and password for your account. If you forgot your password, use “Forgot password”.'
+    }
+
+    return nepali
+      ? 'म लगइन, खाता खोल्ने वा पासवर्ड रिसेट गर्नेबारे मद्दत गर्न सक्छु। वित्तीय जानकारी हेर्न पहिले लगइन गर्नुहोस्।'
+      : 'I can help with signing in, creating an account, or resetting your password. Please sign in to ask about your finances.'
+  }
 
   if (prompt.includes('balance') || prompt.includes('money') || prompt.includes('worth') || prompt.includes('मौज्दात') || prompt.includes('पैसा')) {
     if (nepali) return `तपाईंको हालको मौज्दात ${formatMoney(totals.total, currency)} छ: बैंकमा ${formatMoney(totals.bank, currency)}, वालेटमा ${formatMoney(totals.wallets, currency)} र नगदमा ${formatMoney(totals.cash, currency)}।`
@@ -68,11 +86,26 @@ function createReply(question, { totals, monthStats, budgetRemaining, savingsGoa
 
 export default function Chatbot() {
   const { user } = useAuth()
+  const isAuthenticated = Boolean(user)
   const { language, t } = useLanguage()
   const { totals, monthStats, budgetRemaining, savingsGoals, settings, loading } = useFinance()
   const [open, setOpen] = useState(false)
-  const [input, setInput] = useState('')
-  const [messages, setMessages] = useState(readMessages)
+  const conversationKey = user
+    ? `user:${user.id || user._id || user.email || 'authenticated'}`
+    : 'guest'
+  const [chat, setChat] = useState(() => ({
+    key: conversationKey,
+    messages: [getWelcomeMessage(isAuthenticated)],
+    input: '',
+  }))
+  if (chat.key !== conversationKey) {
+    setChat({
+      key: conversationKey,
+      messages: [getWelcomeMessage(isAuthenticated)],
+      input: '',
+    })
+  }
+  const { messages, input } = chat
   const messagesEndRef = useRef(null)
 
   const context = useMemo(
@@ -81,23 +114,33 @@ export default function Chatbot() {
   )
 
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(messages.slice(-30)))
+    localStorage.removeItem(LEGACY_STORAGE_KEY)
+  }, [])
+
+  useEffect(() => {
     if (open) messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages, open])
 
   function submit(event) {
     event.preventDefault()
     const question = input.trim()
-    if (!question || loading) return
+    if (!question || (isAuthenticated && loading)) return
 
     const userMessage = { id: `${Date.now()}-user`, role: 'user', content: question }
     const assistantMessage = {
       id: `${Date.now()}-assistant`,
       role: 'assistant',
-      content: createReply(question, context, language),
+      content: createReply(question, context, language, isAuthenticated),
     }
-    setMessages((current) => [...current, userMessage, assistantMessage])
-    setInput('')
+    setChat((current) => ({
+      key: conversationKey,
+      input: '',
+      messages: [
+        ...(current.key === conversationKey ? current.messages : [getWelcomeMessage(isAuthenticated)]),
+        userMessage,
+        assistantMessage,
+      ].slice(-30),
+    }))
   }
 
   return (
@@ -111,7 +154,7 @@ export default function Chatbot() {
               </div>
               <div>
                 <p className="text-sm font-semibold">Finora Guide</p>
-                <p className="text-xs text-slate-300">{t('Your personal finance assistant')}</p>
+                <p className="text-xs text-slate-300">{t(isAuthenticated ? 'Your personal finance assistant' : 'Sign-in and account help')}</p>
               </div>
             </div>
             <button type="button" onClick={() => setOpen(false)} className="rounded-lg p-1.5 text-slate-300 hover:bg-white/10 hover:text-white" aria-label={t('Close chat')}>
@@ -127,14 +170,21 @@ export default function Chatbot() {
                 </p>
               </div>
             ))}
+            {!isAuthenticated ? (
+              <div className="flex flex-wrap gap-2">
+                <Link to="/login" className="rounded-lg bg-indigo-600 px-3 py-2 text-xs font-semibold text-white hover:bg-indigo-700">{t('Sign in')}</Link>
+                <Link to="/register" className="rounded-lg border border-slate-300 px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-white dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-900">{t('Create account')}</Link>
+                <Link to="/forgot-password" className="rounded-lg px-2 py-2 text-xs font-medium text-indigo-600 hover:underline dark:text-indigo-300">{t('Forgot password')}</Link>
+              </div>
+            ) : null}
             <div ref={messagesEndRef} />
           </div>
 
           <form onSubmit={submit} className="border-t border-slate-200 bg-white p-3 dark:border-slate-700 dark:bg-slate-900">
             <label className="sr-only" htmlFor="finora-chat-input">{t('Ask Finora Guide')}</label>
             <div className="flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 p-1.5 focus-within:border-indigo-400 dark:border-slate-700 dark:bg-slate-950">
-              <input id="finora-chat-input" value={input} onChange={(event) => setInput(event.target.value)} placeholder={user ? `${t('Ask about your finances')}, ${user.name?.split(' ')[0] || t('there')}` : t('Ask about your finances')} className="min-w-0 flex-1 bg-transparent px-2 text-sm text-slate-900 outline-none placeholder:text-slate-400 dark:text-white" />
-              <button type="submit" disabled={!input.trim() || loading} className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-indigo-600 text-white transition hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-40" aria-label={t('Send message')}>
+              <input id="finora-chat-input" value={input} onChange={(event) => setChat((current) => ({ ...current, input: event.target.value }))} placeholder={isAuthenticated ? `${t('Ask about your finances')}, ${user.name?.split(' ')[0] || t('there')}` : t('Ask about signing in')} className="min-w-0 flex-1 bg-transparent px-2 text-sm text-slate-900 outline-none placeholder:text-slate-400 dark:text-white" />
+              <button type="submit" disabled={!input.trim() || (isAuthenticated && loading)} className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-indigo-600 text-white transition hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-40" aria-label={t('Send message')}>
                 <Send className="h-4 w-4" />
               </button>
             </div>
