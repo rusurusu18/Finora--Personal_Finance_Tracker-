@@ -14,6 +14,7 @@ import translationRoutes from "../module/translation/translation.routes.js";
 import loanRoutes from "../module/loan/loan.routes.js";
 import aiExpenseRoutes from "../module/aiExpense/aiExpense.routes.js";
 
+// The app mounts these feature routes under the /api/v1 prefix.
 const router = express.Router();
 
 router.use("/auth", authRoutes);
